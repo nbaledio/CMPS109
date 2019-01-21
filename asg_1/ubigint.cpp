@@ -5,6 +5,7 @@
 #include <exception>
 #include <stack>
 #include <stdexcept>
+#include <cmath>
 using namespace std;
 
 #include "ubigint.h"
@@ -141,27 +142,31 @@ ubigint ubigint::operator* (const ubigint& that) const {
   int thislength = this->ubig_value.size();
   int thatlength = that.ubig_value.size();
   vector<unsigned char> p(thislength + thatlength);
-  
+  //Formula for multiplication
   for(int i = 0; i < thislength - 1; i++){
       c = 0;
       for(int j = 0; j < thatlength - 1; j++){
          d = (p[i+j] - '0') + 
-        ((this->ubig_value[i] - '0')*(that.ubig_value[j] - '0')) + c;
+         ((this->ubig_value[i] - '0')*(that.ubig_value[j] - '0')) + c;
          p[i+j] = ((d%10) + '0');
-		 c = floor(d/10);
+         c = floor(d/10);
       }
       p[i + thatlength] = c + '0';
   }
+  answer.ubig_value = p;
+  return answer;
 }
-/*
+
 void ubigint::multiply_by_2() {
+  ubigint answer;
   // uvalue *= 2;
 }
 
 void ubigint::divide_by_2() {
+  ubigint answer;
   // uvalue /= 2;
 }
-*/
+
 
 struct quo_rem { ubigint quotient; ubigint remainder; };
 quo_rem udivide (const ubigint& dividend, ubigint divisor) {
@@ -239,16 +244,16 @@ bool ubigint::operator< (const ubigint& that) const {
    return false;
 }
 
-ostream& operator<< (ostream& out, const ubigint& that) {
+ostream& operator<< (ostream& out, const ubigint& that) { 
    unsigned int output = 0;
    int increment = 1;
    int current = 0; 
    int length = that.ubig_value.size();
    for(int i = 0; i < length; i++){
-        current = that.ubig_value[i];
-        current *= increment;
-        output += current;
-        increment *=  10;
+       current = 1;
+       current *= increment;
+       output += current;
+       increment *=  10;
    }
    return out << output;
 }
