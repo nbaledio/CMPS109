@@ -134,11 +134,11 @@ ubigint ubigint::operator- (const ubigint& that) const {
    return answer;
 }
 
-/*
 ubigint ubigint::operator* (const ubigint& that) const {
-  // return ubigint (uvalue * that.uvalue);
+  ubigint answer;
+  
 }
-
+/*
 void ubigint::multiply_by_2() {
   // uvalue *= 2;
 }
@@ -146,7 +146,7 @@ void ubigint::multiply_by_2() {
 void ubigint::divide_by_2() {
   // uvalue /= 2;
 }
-
+*/
 
 struct quo_rem { ubigint quotient; ubigint remainder; };
 quo_rem udivide (const ubigint& dividend, ubigint divisor) {
@@ -178,7 +178,7 @@ ubigint ubigint::operator/ (const ubigint& that) const {
 ubigint ubigint::operator% (const ubigint& that) const {
    return udivide (*this, that).remainder;
 }
-*/
+
 bool ubigint::operator== (const ubigint& that) const {
 int size = this->ubig_value.size();
    //Checks to see if this and that are the same size
@@ -223,8 +223,18 @@ bool ubigint::operator< (const ubigint& that) const {
    //Returns false if they are the same number
    return false;
 }
-/*
-ostream& operator<< (ostream& out, const ubigint& that) { 
-   return out << "ubigint(" << that.uvalue << ")";
+
+ostream& operator<< (ostream& out, const ubigint& that) {
+   unsigned int output = 0;
+   int increment = 1;
+   int current = 0; 
+   int length = that.ubig_value.size();
+   for(int i = 0; i < length; i++){
+        current = that.ubig_value[i];
+        current *= increment;
+        output += current;
+        increment *=  10;
+   }
+   return out << output;
 }
-*/
+
