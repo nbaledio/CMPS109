@@ -245,7 +245,33 @@ bool ubigint::operator< (const ubigint& that) const {
 }
 
 ostream& operator<< (ostream& out, const ubigint& that) { 
-   unsigned int output = 0;
+unsigned int nline = 69, size;
+   vector<char> vnum;
+   string num;
+
+   if (that.ubig_value.empty())
+      return out << "0";
+   for (int i : that.ubig_value){
+      //Convert back to 
+      //Apend characters to string vec
+      char c = i + '0';                     
+      vnum.insert(vnum.begin(), c);         
+   }
+   for (char j : vnum){
+      num += j;
+   }
+   size = vnum.size();
+   while (nline < size){
+      num.insert(nline, "\\");
+      num.insert(nline+1, "\n");
+      nline += 71;
+      size += 2;
+   }
+   return out << num;   //Prints number
+
+
+
+  /* unsigned int output = 0;
    int increment = 1;
    int current = 0; 
    int length = that.ubig_value.size();
@@ -255,6 +281,6 @@ ostream& operator<< (ostream& out, const ubigint& that) {
        output += current;
        increment *=  10;
    }
-   return out << output;
+   return out << output;*/
 }
 
