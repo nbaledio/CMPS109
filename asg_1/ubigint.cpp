@@ -136,7 +136,22 @@ ubigint ubigint::operator- (const ubigint& that) const {
 
 ubigint ubigint::operator* (const ubigint& that) const {
   ubigint answer;
+  int c = 0;
+  int d = 0;
+  int thislength = this->ubig_value.size();
+  int thatlength = that.ubig_value.size();
+  vector<unsigned char> p(thislength + thatlength);
   
+  for(int i = 0; i < thislength - 1; i++){
+      c = 0;
+      for(int j = 0; j < thatlength - 1; j++){
+         d = (p[i+j] - '0') + 
+        ((this->ubig_value[i] - '0')*(that.ubig_value[j] - '0')) + c;
+         p[i+j] = ((d%10) + '0');
+		 c = floor(d/10);
+      }
+      p[i + thatlength] = c + '0';
+  }
 }
 /*
 void ubigint::multiply_by_2() {
