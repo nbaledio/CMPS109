@@ -11,7 +11,40 @@ using namespace std;
 #include "ubigint.h"
 #include "debug.h"
 
-ubigint::ubigint (unsigned long that) {
+ubigint::ubigint (unsigned long that)
+{
+   stringstream ss;
+   string that_;
+
+   ss << that;
+   ss >> that_;
+
+   for (char digit : that_)
+   {
+      ubigvalue_t::iterator it = ubig_value.begin();
+      ubig_value.insert(it, digit);
+      if (not isdigit (digit))
+      {
+         throw invalid_argument ("ubigint::ubigint(" + that_ + ")");
+      }
+      //   DEBUGF ('~', this << " -> " << uvalue)
+   }
+}
+
+ubigint::ubigint (const string& that)  
+{
+   for (char digit : that)
+   {
+      ubigvalue_t::iterator it = ubig_value.begin();
+      ubig_value.insert(it, digit);
+      if (not isdigit (digit))
+      {
+         throw invalid_argument ("ubigint::ubigint(" + that + ")");
+      }
+   }
+}
+
+/*ubigint::ubigint (unsigned long that) {
   //Stores unsigned integer as a vector of characters.
   //Lowest digit stored first
   int remainder;
@@ -30,7 +63,7 @@ ubigint::ubigint (const string& that) {
       }
    }
 }
-
+*/
 ubigint ubigint::operator+ (const ubigint& that) const {
   ubigint answer;
   int longerlength = 0;
