@@ -1,4 +1,4 @@
-# Makefile.dep created Thu Jan 17 18:04:58 PST 2019
+# Makefile.dep created Sun Jan 20 15:52:34 PST 2019
 ubigint.o: ubigint.cpp ubigint.h debug.h relops.h
 bigint.o: bigint.cpp bigint.h debug.h relops.h ubigint.h
 libfns.o: libfns.cpp libfns.h bigint.h debug.h relops.h ubigint.h
