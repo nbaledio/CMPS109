@@ -245,7 +245,7 @@ bool ubigint::operator< (const ubigint& that) const {
 }
 
 ostream& operator<< (ostream& out, const ubigint& that) { 
-unsigned int nline = 69, size;
+/*unsigned int nline = 69, size;
    vector<char> vnum;
    string num;
 
@@ -268,19 +268,17 @@ unsigned int nline = 69, size;
       size += 2;
    }
    return out << num;   //Prints number
-
-
-
-  /* unsigned int output = 0;
+*/
+   int output = 0;
    int increment = 1;
    int current = 0; 
    int length = that.ubig_value.size();
    for(int i = 0; i < length; i++){
-       current = 1;
-       current *= increment;
-       output += current;
-       increment *=  10;
+        current = that.ubig_value[i] - '0';
+        current *= increment;
+        output += current;
+        increment *=  10;
    }
-   return out << output;*/
+   return out << output;
 }
 
