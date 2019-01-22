@@ -1,0 +1,8 @@
+partnercheck: ./PARTNER: format OK:
+username = nbaledio
+passwd   = *
+uid      = 227097
+gid      = 100
+gecos    = Nathan Zachary-Palacio Baledio
+home     = /afs/cats.ucsc.edu/users/j/nbaledio
+shell    = /bin/bash
