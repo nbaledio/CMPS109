@@ -1,0 +1,4 @@
+checksource: README*: No such file or directory
+checksource: improper character \x09 = ^I (tab)
+   file "ubigint.h": 2 errors: lines 19--20
+checksource: TOTAL COMPLAINTS: 3
