@@ -6,6 +6,8 @@
 // -trimming of higher order zeros has condition of while size > 1
 //  instead of size > 0, as any calculation resulting in 0 will
 //  return an empty vector
+//  -division formula derived from 
+//  https://en.wikipedia.org/wiki/Division_by_two
 
 #include <cctype>
 #include <cstdlib>
@@ -22,9 +24,11 @@ ubigint::ubigint (unsigned long that) {
   //Stores unsigned integer as a vector of characters.
   //Lowest digit stored first
   int remainder;
+  unsigned char ch;
   while (that > 0){
         remainder = that%10;
-        ubig_value.push_back(remainder);
+        ch = remainder + '0';
+        ubig_value.push_back(ch);
         that /= 10;
   }
 }
@@ -98,7 +102,7 @@ ubigint ubigint::operator+ (const ubigint& that) const {
   }
 
   //Trims higher order zeros
-  while(answer.ubig_value.size() > 1 && answer.ubig_value.back() == 0){
+  while(answer.ubig_value.size() > 1&& answer.ubig_value.back()=='0'){
         answer.ubig_value.pop_back();
    }
         return answer;
@@ -148,7 +152,7 @@ ubigint ubigint::operator- (const ubigint& that) const {
        answer.ubig_value.push_back(value);
    }
    //Trims higher order zeroes
-   while(answer.ubig_value.size() > 1 && answer.ubig_value.back() == 0){
+   while(answer.ubig_value.size() > 1 && answer.ubig_value.back()=='0'){
         answer.ubig_value.pop_back();
    }   
    return answer;
@@ -189,10 +193,22 @@ int plength = p.size();
 }
 
 void ubigint::multiply_by_2() {
-   ubigint result;
-   result.ubig_value = this->ubig_value;
-   result = result + result;
-   this->ubig_value = result.ubig_value;
+   ubigint answer;
+   int size = this->ubig_value.size();
+   for(int i = 0; i < size; i++){
+        answer.ubig_value.push_back(this->ubig_value[i]);
+   }
+   answer = answer + answer;
+   int size2 = answer.ubig_value.size();
+   this->ubig_value.clear();
+   for(int i = 0; i < size2; i++){
+        this->ubig_value.push_back(answer.ubig_value[i]);
+   }
+
+   //Trims higher order zeros
+   while(this->ubig_value.size() > 1 && this->ubig_value.back() == '0'){
+         this->ubig_value.pop_back();
+   }
 }
 
 void ubigint::divide_by_2() {
@@ -243,20 +259,36 @@ void ubigint::divide_by_2() {
   }
   int length = result.ubig_value.size();
   //Takes result ubigint from above and puts it in the right order
-  for(int i = length; i >=0; i--){
+  for(int i = length - 1; i >=0; i--){
         resultreversed.ubig_value.push_back(result.ubig_value[i]);
   }
-this->ubig_value = resultreversed.ubig_value;
+  int length2 = resultreversed.ubig_value.size();
+  this->ubig_value.clear();
+  for(int i = 0; i < length2; i++){
+        this->ubig_value.push_back(resultreversed.ubig_value[i]);
+  }
+  //Trims higher order zeros
+  while(this->ubig_value.size() > 1 && this->ubig_value.back() == '0'){
+        this->ubig_value.pop_back();
+  }
+}
+
+void ubigint::append(unsigned char ch){
+        this->ubig_value.push_back(ch);
 }
 
 
 struct quo_rem { ubigint quotient; ubigint remainder; };
 quo_rem udivide (const ubigint& dividend, ubigint divisor) {
+
    // Note: divisor is modified so pass by value (copy).
-   ubigint zero {0};
+   ubigint zero;
+   zero.append('0');
    if (divisor == zero) throw domain_error ("udivide by zero");
-   ubigint power_of_2 {1};
-   ubigint quotient {0};
+   ubigint power_of_2;
+   power_of_2.append('1');
+   ubigint quotient;
+   quotient.append('0');
    ubigint remainder {dividend}; // left operand, dividend
    while (divisor < remainder) {
       divisor.multiply_by_2();

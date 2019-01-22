@@ -24,6 +24,7 @@ class ubigint {
    public:
       void multiply_by_2();
       void divide_by_2();
+      void append(unsigned char);
 
       ubigint() = default; // Need default ctor as well.
       ubigint (unsigned long);
