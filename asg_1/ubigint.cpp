@@ -18,19 +18,6 @@ using namespace std;
 #include "ubigint.h"
 #include "debug.h"
 
-ubigint::ubigint (const string& that)  
-{
-   for (char digit : that)
-   {
-      ubigvalue_t::iterator it = ubig_value.begin();
-      ubig_value.insert(it, digit);
-      if (not isdigit (digit))
-      {
-         throw invalid_argument ("ubigint::ubigint(" + that + ")");
-      }
-   }
-}
-
 ubigint::ubigint (unsigned long that) {
   //Stores unsigned integer as a vector of characters.
   //Lowest digit stored first
@@ -41,16 +28,17 @@ ubigint::ubigint (unsigned long that) {
         that /= 10;
   }
 }
-/*
+
 ubigint::ubigint (const string& that) {
    DEBUGF ('~', "that = \"" << that << "\"");
-   for (char digit: that) {
-      if (not isdigit (digit)) {
+   for (int i = that.length() - 1; i >= 0; i--) {
+      if (not isdigit (that.at(i))) {
         throw invalid_argument ("ubigint::ubigint(" + that + ")");
       }
+      ubig_value.push_back(that.at(i));
    }
 }
-*/
+
 ubigint ubigint::operator+ (const ubigint& that) const {
   ubigint answer;
   unsigned char value;
@@ -200,16 +188,64 @@ int plength = p.size();
 }
 
 void ubigint::multiply_by_2() {
-//  this->ubig_value = this->ubig_value + this->ubig_value;
-  //Trims higher order zeros
-//  while(this->ubig_value.size() > 0 && this->ubig_value.back() == 0){
-//        this->ubig_value.pop_back();
-//  }
+   ubigint result;
+   result.ubig_value = this->ubig_value;
+   result = result + result;
+   this->ubig_value = result.ubig_value;
 }
 
 void ubigint::divide_by_2() {
-  ubigint answer;
-  // uvalue /= 2;
+  int firstdigit = 0;
+  int seconddigit = 0;
+  ubigint result;
+  ubigint resultreversed;
+  //Appends a zero to the start so it can be compared properly
+  this->ubig_value.push_back('0');
+  //Algorithm that compares digits and appends them to a ubigint
+  //in reversed order
+  for(int i = ubig_value.size() - 1; i > 0; i--){
+        firstdigit = ubig_value[i] - '0';
+        seconddigit = ubig_value[i-1] - '0';
+        if(firstdigit%2 == 0){
+                if(seconddigit == 0 || seconddigit == 1){
+                        result.ubig_value.push_back('0');
+                }
+                if(seconddigit == 2 || seconddigit == 3){
+                        result.ubig_value.push_back('1');
+                }
+                if(seconddigit == 4 || seconddigit == 5){
+                        result.ubig_value.push_back('2');
+                }
+                if(seconddigit == 6 || seconddigit == 7){
+                        result.ubig_value.push_back('3');
+                }
+                if(seconddigit == 8 || seconddigit == 9){
+                        result.ubig_value.push_back('4');
+                }
+        }else{
+                if(seconddigit == 0 || seconddigit == 1){
+                        result.ubig_value.push_back('5');
+                }
+                if(seconddigit == 2 || seconddigit == 3){
+                        result.ubig_value.push_back('6');
+                }
+                if(seconddigit == 4 || seconddigit == 5){
+                        result.ubig_value.push_back('7');
+                }
+                if(seconddigit == 6 || seconddigit == 7){
+                        result.ubig_value.push_back('8');
+                }
+                if(seconddigit == 8 || seconddigit == 9){
+                        result.ubig_value.push_back('9');
+                }
+        }
+  }
+  int length = result.ubig_value.size();
+  //Takes result ubigint from above and puts it in the right order
+  for(int i = length; i >=0; i--){
+        resultreversed.ubig_value.push_back(result.ubig_value[i]);
+  }
+this->ubig_value = resultreversed.ubig_value;
 }
 
 
@@ -221,9 +257,11 @@ quo_rem udivide (const ubigint& dividend, ubigint divisor) {
    ubigint power_of_2 {1};
    ubigint quotient {0};
    ubigint remainder {dividend}; // left operand, dividend
+cout << "test";
    while (divisor < remainder) {
       divisor.multiply_by_2();
       power_of_2.multiply_by_2();
+cout << "test";
    }
    while (power_of_2 > zero) {
       if (divisor <= remainder) {
