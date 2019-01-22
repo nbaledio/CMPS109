@@ -6,6 +6,7 @@
 #include <stack>
 #include <stdexcept>
 #include <cmath>
+#include <sstream>
 using namespace std;
 
 #include "ubigint.h"
@@ -66,6 +67,7 @@ ubigint::ubigint (const string& that) {
 */
 ubigint ubigint::operator+ (const ubigint& that) const {
   ubigint answer;
+  unsigned char value;
   int longerlength = 0;
   int remainder = 0;
   int carryvalue = 0;
@@ -91,7 +93,7 @@ ubigint ubigint::operator+ (const ubigint& that) const {
                 v2 = that.ubig_value[i] - '0';
         }else if ( i >= thatsize){
                 v1 = this->ubig_value[i] - '0';
-                v2 = 0; 
+                v2 = 0;
         }else{
                 v1 = this->ubig_value[i] - '0';
                 v2 = that.ubig_value[i] - '0';
@@ -101,22 +103,30 @@ ubigint ubigint::operator+ (const ubigint& that) const {
         //Sets remainder/carry value is sum is >= 10
         if (sum >= 10){
                 remainder = sum%10;
-                answer.ubig_value.push_back(remainder);
-                carryvalue /= sum;
+                value = remainder + '0';
+                answer.ubig_value.push_back(value);
+                carryvalue = 1;
                 //Checks if current digit pair is highest order
                 //Appends carry value if it is since it is 
                 //the last iteration
                 //Ex:209 + 800 = 1009 
                 if(i == longerlength - 1){
-                        answer.ubig_value.push_back(carryvalue);
+                        value = carryvalue + '0';
+                        answer.ubig_value.push_back(value);
                 }
         //Pushes sum if it's less than 10
         }else{
-                answer.ubig_value.push_back(sum);
+                value = sum + '0';
+                answer.ubig_value.push_back(value);
                 remainder = 0;
                 carryvalue = 0;
         }
   }
+
+  //Trims higher order zeros
+  while(answer.ubig_value.size() > 0 && answer.ubig_value.back() == 0){
+        answer.ubig_value.pop_back();
+   }
         return answer;
 }
 
@@ -125,6 +135,7 @@ ubigint ubigint::operator- (const ubigint& that) const {
    //integers cannot handle negative numbers
    if (*this < that) throw domain_error ("ubigint::operator-(a<b)");
    ubigint answer;
+   unsigned char value;
    int thisvalue = 0;
    int thatvalue = 0;
    int looplength = this->ubig_value.size();
@@ -134,21 +145,21 @@ ubigint ubigint::operator- (const ubigint& that) const {
    for(int i = 0; i < looplength; i++){
         //Checks if previous iteration carried a 1
         if(carry == true){
-                thisvalue = this->ubig_value[i] - 1;
+                thisvalue = (this->ubig_value[i] - '0') - 1;
                 //Checks if iteration is out of bounds for that value
                 if(i >= thatlength){
                         thatvalue = 0;
                 }else{
-                        thatvalue = that.ubig_value[i];
+                        thatvalue = that.ubig_value[i] - '0';
                 }
                 carry = false;
         }else{
-                thisvalue = this->ubig_value[i];
+                thisvalue = this->ubig_value[i] - '0';
                 //Checks if iteration is out of bounds for that value
                 if(i >= thatlength){
                         thatvalue = 0;
                 }else{
-                        thatvalue = that.ubig_value[i];
+                        thatvalue = that.ubig_value[i] - '0';
                 }
         }
        //Checks if thisvalue is less than thatvalue and carries a
@@ -159,7 +170,8 @@ ubigint ubigint::operator- (const ubigint& that) const {
                 carry = true;
        }
        difference = thisvalue - thatvalue;
-       answer.ubig_value.push_back(difference);
+       value = difference + '0';
+       answer.ubig_value.push_back(value);
    }
    //Trims higher order zeroes
    while(answer.ubig_value.size() > 0 && answer.ubig_value.back() == 0){
@@ -170,29 +182,40 @@ ubigint ubigint::operator- (const ubigint& that) const {
 
 ubigint ubigint::operator* (const ubigint& that) const {
   ubigint answer;
+  unsigned char value;
   int c = 0;
   int d = 0;
   int thislength = this->ubig_value.size();
   int thatlength = that.ubig_value.size();
-  vector<unsigned char> p(thislength + thatlength);
+  vector<unsigned char> p(thislength + thatlength,'0');
   //Formula for multiplication
-  for(int i = 0; i < thislength - 1; i++){
+  for(int i = 0; i < thislength; i++){
       c = 0;
-      for(int j = 0; j < thatlength - 1; j++){
-         d = (p[i+j] - '0') + 
-         ((this->ubig_value[i] - '0')*(that.ubig_value[j] - '0')) + c;
-         p[i+j] = ((d%10) + '0');
-         c = floor(d/10);
+      for(int j = 0; j < thatlength; j++){
+      d = (p[i+j] - '0') + 
+      ((this->ubig_value[i] - '0')*(that.ubig_value[j] - '0')) + c;
+      p[i+j] = ((d%10) + '0');
+      c = floor(d/10);
       }
-      p[i + thatlength] = c + '0';
+      value = c + '0';
+      p[i + thatlength] = value;
   }
-  answer.ubig_value = p;
+int plength = p.size();
+  //Appends answer to ubigint answer
+  for(int k = 0; k < plength; k++){
+        answer.ubig_value.push_back(p[k]);
+  }
+
+  //Trims higher order zeros
+  while(answer.ubig_value.size() > 0 && answer.ubig_value.back() == 0){
+        answer.ubig_value.pop_back();
+   }
   return answer;
 }
 
 void ubigint::multiply_by_2() {
   ubigint answer;
-  // uvalue *= 2;
+  answer = answer + answer;
 }
 
 void ubigint::divide_by_2() {
@@ -264,9 +287,9 @@ bool ubigint::operator< (const ubigint& that) const {
    }
    //Compares digits if they are the same length. Starts at the
    //highest order first, then scrolls to the lowest order
-   for(int i = thissize; i >= 0; --i){
-        thisvalue = this->ubig_value[i];
-        thatvalue = that.ubig_value[i];
+   for(int i = thissize - 1; i >= 0; i--){
+        thisvalue = this->ubig_value[i] - '0';
+        thatvalue = that.ubig_value[i] - '0';
         if(thisvalue < thatvalue){
                 return true;
         }else if (thatvalue < thisvalue){
@@ -277,41 +300,18 @@ bool ubigint::operator< (const ubigint& that) const {
    return false;
 }
 
-ostream& operator<< (ostream& out, const ubigint& that) { 
-/*unsigned int nline = 69, size;
-   vector<char> vnum;
-   string num;
-
-   if (that.ubig_value.empty())
-      return out << "0";
-   for (int i : that.ubig_value){
-      //Convert back to 
-      //Apend characters to string vec
-      char c = i + '0';                     
-      vnum.insert(vnum.begin(), c);         
+ostream& operator<< (ostream& out, const ubigint& that) {
+   //New ubigint since that is a constant (can't be changed)
+   ubigint answer = that;
+   //Trims high order zeros 
+   while(answer.ubig_value.size() > 0 &&answer.ubig_value.back()=='0'){
+        answer.ubig_value.pop_back();
    }
-   for (char j : vnum){
-      num += j;
+   int length = answer.ubig_value.size();
+   //Appends digits to output, from high order to low order
+   for(int i = length - 1; i >= 0; i--){
+        out << answer.ubig_value[i];
    }
-   size = vnum.size();
-   while (nline < size){
-      num.insert(nline, "\\");
-      num.insert(nline+1, "\n");
-      nline += 71;
-      size += 2;
-   }
-   return out << num;   //Prints number
-*/
-   int output = 0;
-   int increment = 1;
-   int current = 0; 
-   int length = that.ubig_value.size();
-   for(int i = 0; i < length; i++){
-        current = that.ubig_value[i] - '0';
-        current *= increment;
-        output += current;
-        increment *=  10;
-   }
-   return out << output;
+   return out;
 }
 
