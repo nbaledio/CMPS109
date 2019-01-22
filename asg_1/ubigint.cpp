@@ -330,6 +330,7 @@ bool ubigint::operator< (const ubigint& that) const {
 ostream& operator<< (ostream& out, const ubigint& that) {
    //New ubigint since that is a constant (can't be changed)
    ubigint answer = that;
+   int counter = 0;
    //Trims high order zeros 
    while(answer.ubig_value.size() > 1 &&answer.ubig_value.back()=='0'){
         answer.ubig_value.pop_back();
@@ -337,7 +338,15 @@ ostream& operator<< (ostream& out, const ubigint& that) {
    int length = answer.ubig_value.size();
    //Appends digits to output, from high order to low order
    for(int i = length - 1; i >= 0; i--){
+        if(counter == 69){
+                counter = 0;
+                char line = 92;
+                char newline = 10;
+                out << line;
+                out << newline;
+        }
         out << answer.ubig_value[i];
+        counter++;
    }
    return out;
 }
