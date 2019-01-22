@@ -1,4 +1,11 @@
 // $Id: ubigint.cpp,v 1.14 2016-06-23 17:21:26-07 - - $
+// Nathan Baledio
+// ID: 157454
+// NOTES:
+// -multiplication formula derived from pdf
+// -trimming of higher order zeros has condition of while size > 1
+//  instead of size > 0, as any calculation resulting in 0 will
+//  return an empty vector
 
 #include <cctype>
 #include <cstdlib>
@@ -6,31 +13,10 @@
 #include <stack>
 #include <stdexcept>
 #include <cmath>
-#include <sstream>
 using namespace std;
 
 #include "ubigint.h"
 #include "debug.h"
-
-ubigint::ubigint (unsigned long that)
-{
-   stringstream ss;
-   string that_;
-
-   ss << that;
-   ss >> that_;
-
-   for (char digit : that_)
-   {
-      ubigvalue_t::iterator it = ubig_value.begin();
-      ubig_value.insert(it, digit);
-      if (not isdigit (digit))
-      {
-         throw invalid_argument ("ubigint::ubigint(" + that_ + ")");
-      }
-      //   DEBUGF ('~', this << " -> " << uvalue)
-   }
-}
 
 ubigint::ubigint (const string& that)  
 {
@@ -45,7 +31,7 @@ ubigint::ubigint (const string& that)
    }
 }
 
-/*ubigint::ubigint (unsigned long that) {
+ubigint::ubigint (unsigned long that) {
   //Stores unsigned integer as a vector of characters.
   //Lowest digit stored first
   int remainder;
@@ -55,7 +41,7 @@ ubigint::ubigint (const string& that)
         that /= 10;
   }
 }
-
+/*
 ubigint::ubigint (const string& that) {
    DEBUGF ('~', "that = \"" << that << "\"");
    for (char digit: that) {
@@ -124,7 +110,7 @@ ubigint ubigint::operator+ (const ubigint& that) const {
   }
 
   //Trims higher order zeros
-  while(answer.ubig_value.size() > 0 && answer.ubig_value.back() == 0){
+  while(answer.ubig_value.size() > 1 && answer.ubig_value.back() == 0){
         answer.ubig_value.pop_back();
    }
         return answer;
@@ -133,7 +119,7 @@ ubigint ubigint::operator+ (const ubigint& that) const {
 ubigint ubigint::operator- (const ubigint& that) const {
    //Checks if this < that and throws an error if true since unsigned
    //integers cannot handle negative numbers
-   if (*this < that) throw domain_error ("ubigint::operator-(a<b)");
+//   if (*this < that) throw domain_error ("ubigint::operator-(a<b)");
    ubigint answer;
    unsigned char value;
    int thisvalue = 0;
@@ -174,7 +160,7 @@ ubigint ubigint::operator- (const ubigint& that) const {
        answer.ubig_value.push_back(value);
    }
    //Trims higher order zeroes
-   while(answer.ubig_value.size() > 0 && answer.ubig_value.back() == 0){
+   while(answer.ubig_value.size() > 1 && answer.ubig_value.back() == 0){
         answer.ubig_value.pop_back();
    }   
    return answer;
@@ -207,15 +193,18 @@ int plength = p.size();
   }
 
   //Trims higher order zeros
-  while(answer.ubig_value.size() > 0 && answer.ubig_value.back() == 0){
+  while(answer.ubig_value.size() > 1 && answer.ubig_value.back() == 0){
         answer.ubig_value.pop_back();
    }
   return answer;
 }
 
 void ubigint::multiply_by_2() {
-  ubigint answer;
-  answer = answer + answer;
+//  this->ubig_value = this->ubig_value + this->ubig_value;
+  //Trims higher order zeros
+//  while(this->ubig_value.size() > 0 && this->ubig_value.back() == 0){
+//        this->ubig_value.pop_back();
+//  }
 }
 
 void ubigint::divide_by_2() {
@@ -304,7 +293,7 @@ ostream& operator<< (ostream& out, const ubigint& that) {
    //New ubigint since that is a constant (can't be changed)
    ubigint answer = that;
    //Trims high order zeros 
-   while(answer.ubig_value.size() > 0 &&answer.ubig_value.back()=='0'){
+   while(answer.ubig_value.size() > 1 &&answer.ubig_value.back()=='0'){
         answer.ubig_value.pop_back();
    }
    int length = answer.ubig_value.size();

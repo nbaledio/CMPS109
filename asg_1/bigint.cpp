@@ -30,13 +30,16 @@ bigint bigint::operator+ () const {
 bigint bigint::operator- () const {
    return {uvalue, not is_negative};
 }
-
+//Addition operator. Calls ubigint's +
 bigint bigint::operator+ (const bigint& that) const {
    bigint result;
+   //Checks if signs are the same
    if(this->is_negative == that.is_negative){
         result.uvalue = this->uvalue + that.uvalue;
         result.is_negative = this->is_negative;
    }else{
+        //Checks for which sign to use. Also sets sign to
+        //positive if result is zero
         if(this->uvalue < that.uvalue){
                 result.uvalue = that.uvalue - this->uvalue;
                 result.is_negative = that.is_negative;
@@ -51,19 +54,76 @@ bigint bigint::operator+ (const bigint& that) const {
    return result;
 }
 
+//Subtraction operator. Uses ubigint's -
 bigint bigint::operator- (const bigint& that) const {
-   ubigint result = uvalue - that.uvalue;
+   bigint result;
+   bigint checkzero(0);
+   //Checks for which sign to use. Also sets sign to
+   //positive if result is zero
+   if(this->is_negative != that.is_negative){
+        result.uvalue = this->uvalue + that.uvalue;
+        result.is_negative = this->is_negative;
+   }else{
+        //If signs are both negative
+        if(this->is_negative == true){
+                if(that.uvalue > this->uvalue){
+                       result.uvalue = that.uvalue - this->uvalue;
+                       result.is_negative = false; 
+                }else{
+                       result.uvalue = this->uvalue - that.uvalue;
+                       result.is_negative = true;
+                }
+        //If signs are both positive
+        }else if(this->is_negative == false){
+                if(that.uvalue > this->uvalue){
+                        result.uvalue = that.uvalue - this->uvalue;
+                        result.is_negative = true;
+                }else{
+                        result.uvalue = this->uvalue - that.uvalue;
+                        result.is_negative = false;
+                }
+        }
+   }
+   if(this->uvalue == that.uvalue&&this->is_negative==that.is_negative){
+        result.is_negative = false;
+   }
    return result;
 }
 
+//Multiplication operator. Uses ubigint's *
 bigint bigint::operator* (const bigint& that) const {
-   bigint result = uvalue * that.uvalue;
-   return result;
+   bigint result;
+   bigint checkzero(0);
+   result.uvalue = this->uvalue * that.uvalue;
+   //Checks for which sign to use. Also sets sign to
+   //positive if result is zero
+   if(this->is_negative != that.is_negative){
+        result.is_negative = true;
+   }else{
+        result.is_negative = false;
+   }
+   if(result == checkzero){
+        result.is_negative = false;
+   }
+return result;
 }
 
+//Division operator. Uses ubigint's /
 bigint bigint::operator/ (const bigint& that) const {
-   bigint result = uvalue / that.uvalue;
-   return result;
+   bigint result;
+   bigint checkzero(0);
+   result.uvalue = this->uvalue / that.uvalue;
+   //Checks for which sign to use. Also sets sign to
+   //positive if result is zero
+   if(this->is_negative != that.is_negative){
+        result.is_negative = true;
+   }else{
+        result.is_negative = false;
+   }
+   if(result == checkzero){
+        result.is_negative = false;
+   }
+return result;
 }
 
 bigint bigint::operator% (const bigint& that) const {
