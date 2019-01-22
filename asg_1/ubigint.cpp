@@ -166,10 +166,11 @@ ubigint ubigint::operator* (const ubigint& that) const {
   for(int i = 0; i < thislength; i++){
       c = 0;
       for(int j = 0; j < thatlength; j++){
-      d = (p[i+j] - '0') + 
-      ((this->ubig_value[i] - '0')*(that.ubig_value[j] - '0')) + c;
-      p[i+j] = ((d%10) + '0');
-      c = floor(d/10);
+                d = (p[i+j] - '0') + 
+                ((this->ubig_value[i] - '0')*(that.ubig_value[j] - '0'))
+                + c;
+                p[i+j] = ((d%10) + '0');
+                c = floor(d/10);
       }
       value = c + '0';
       p[i + thatlength] = value;
@@ -257,11 +258,9 @@ quo_rem udivide (const ubigint& dividend, ubigint divisor) {
    ubigint power_of_2 {1};
    ubigint quotient {0};
    ubigint remainder {dividend}; // left operand, dividend
-cout << "test";
    while (divisor < remainder) {
       divisor.multiply_by_2();
       power_of_2.multiply_by_2();
-cout << "test";
    }
    while (power_of_2 > zero) {
       if (divisor <= remainder) {
