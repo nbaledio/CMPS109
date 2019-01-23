@@ -1,1 +1,37 @@
-rtgwafgwaf
+Nathan Baledio
+ID: 1574354
+CruzID: nbaledio
+_ _ _ _ _ _ _ _ _
+
+Files included:
+
+Makefile
+Makefile.dep
+bigint.cpp
+bigint.h
+debug.cpp
+debug.h
+iterstack.h
+libfns.cpp
+libfns.h
+main.cpp
+relops.h
+scanner.cpp
+scanner.h
+ubigint.cpp
+ubigint.h
+util.cpp
+util.h
+
+Notes:
+- I did not do pair programming for this assignment
+- I added a new function "append()" to ubigint so it could format
+correctly in the udivide function
+- I slightly modified the libfns.cpp file so that the static 
+bigints declared there would be created with the proper format
+-Multiplication formula was derived from asg1-dc-bigint.pdf
+-Division by two formula was derived from 
+https://en.wikipedia.org/wiki/Division_by_two
+- I modified the formula for trimming zeros provided in the pdf
+as the formula would pop results of "0" and return and empty
+ubigint. Formula now has condition of size > 1
