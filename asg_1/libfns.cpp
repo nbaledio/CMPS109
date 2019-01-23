@@ -10,9 +10,9 @@
 bigint pow (const bigint& base_arg, const bigint& exponent_arg) {
    bigint base (base_arg);
    bigint exponent (exponent_arg);
-   static const bigint ZERO (0);
-   static const bigint ONE (1);
-   static const bigint TWO (2);
+   static const bigint ZERO(0);
+   static const bigint ONE(1);
+   static const bigint TWO(2);
    DEBUGF ('^', "base = " << base << ", exponent = " << exponent);
    if (base == ZERO) return ZERO;
    bigint result = ONE;
