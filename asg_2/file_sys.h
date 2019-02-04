@@ -37,6 +37,7 @@ class inode_state {
       inode_ptr root {nullptr};
       inode_ptr cwd {nullptr};
       string prompt_ {"% "};
+      string path = "/";
    public:
       inode_state (const inode_state&) = delete; // copy ctor
       inode_state& operator= (const inode_state&) = delete; // op=
@@ -45,7 +46,9 @@ class inode_state {
       void setprompt(string input){prompt_ = input;} //Setter to change prompt
       inode_ptr getroot(){return root;} //Getter for the root
       inode_ptr getcwd(){return cwd;} //Getter for the directory
-      
+      void setcwd(inode_ptr newcwd){cwd = newcwd;}
+      string getpath(){return path;}
+      void setpath(string newpath){path = newpath;} 
 };
 
 // class inode -
@@ -67,12 +70,10 @@ class inode {
       static int next_inode_nr;
       int inode_nr;
       base_file_ptr contents;
-      string path;
       string name;
    public:
       inode (file_type);
       int get_inode_nr() const;
-      string getpath(){return path;}
       string getname() {return name;}
       void setname(string input){name = input;}
       base_file_ptr getcontents(){return contents;}

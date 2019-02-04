@@ -41,7 +41,7 @@ int exit_status_message() {
 }
 
 // ACTUALLY GO BACK AND MAKE IT LOOP THROUGH MULTIPLE ARGUMENTS
-// cat command completei
+// cat command complete
 void fn_cat (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
@@ -83,20 +83,104 @@ void fn_cat (inode_state& state, const wordvec& words){
    }
 }
 
+// cd command complete
 void fn_cd (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   //Sets to root if no arguments are given
    if(words.size() == 1){
-        throw command_error("no path specified");
+        state.setpath("/");
+        state.setcwd(state.getroot());
+        return;
+   }
+   if(words.size() == 2){
+        if(words[1].size() == 1 && words[1].at(0) == '/'){
+               state.setpath("/");
+               state.setcwd(state.getroot());
+               return;
+         }
    }
    if(words.size() > 2){
         throw command_error("more than one operand given");
    }
-   string pth = words[1];
-   if(words.at(0) == "/"){
-
+   inode_ptr it;
+   //Creates a wordvec of individual path names
+   wordvec path = split(words.at(1), "/");
+   inode_ptr original = state.getcwd();
+   //Determines where to start iteration (root or cwd)
+   if(words[1].at(0) == '/'){
+         it = state.getroot();
+   }else{
+         it = state.getcwd();
+   }
+   for(unsigned int i = 0; i < path.size(); i++){
+        bool filefound = false;
+        map<string,inode_ptr> cdirents1 = 
+        it->getcontents()->getdirents();
+        std::map<std::string, inode_ptr>::
+        iterator it2 = cdirents1.begin();
+        //Iterate through dirents of current directory
+        while(it2 != cdirents1.end()){
+                //If name is found, check if it is a directory
+                if(it2->first == path[i]){
+                    //If file is directory, change current directory
+                    if(it2->second->getcontents()->checkifdir()==true){
+                             filefound = true;
+                             state.setcwd(it2->second);
+                             it = state.getcwd();
+                             break;
+                     }else{
+                             throw command_error("is not a directory");
+                     }
+                }
+                it2++;
+        }
+        if(filefound == false){
+                state.setcwd(original);
+                throw command_error("directory does not exist");
+        }
    } 
-   
+   //Updates the path of the cwd
+   string updatepath;
+   if(words[1].at(0) == '.' && words[1].size() == 1){
+        return;
+   }
+   if(words[1].size() == 2){
+        if(words[1].at(0) == '.' && words[1].at(1) == '.'){
+                string currname = state.getpath();
+                bool end = false;
+                for(int i = currname.size()-1; i >= 0; i--){
+                        if(currname.at(i) == '/'){
+                             end = true;
+                        }
+                        currname.erase(i);
+                        if(end == true){
+                             state.setpath(currname);
+                             if(state.getpath().size() == 0){
+                                  state.setpath("/");
+                             }
+                             return;
+                        }
+                }
+        }
+   }
+   if(words[1].at(0) == '/'){
+         for(unsigned int i = 0; i < path.size(); i++){
+                updatepath = "/" + path[i];
+         }
+         state.setpath(updatepath);
+   }else{
+         for(unsigned int i = 0; i < path.size(); i++){
+                if(state.getpath().size() == 1){
+                        updatepath = path[i];
+                        continue;
+                }
+                updatepath = "/" + path[i];
+         }
+         string oldpath = state.getpath();
+         oldpath += updatepath;
+         state.setpath(oldpath);
+   }
 }
 
 // Echo command complete
@@ -114,27 +198,56 @@ void fn_exit (inode_state& state, const wordvec& words){
    throw ysh_exit();
 }
 
-// IN PROGRESS
+//CHANGE FORMAT EX: .:
+// ls command complete
 void fn_ls (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
    inode_ptr cwd = state.getcwd();
-   if(words.size() != 1){
-        string test = words[1];
-        if(test.at(0) != '/'){
-                return; //THROW AN ERROR, PATH MUST START WITH ROOT
+   inode_ptr tempdir;
+   if(words.size() > 2){
+        throw command_error("too many arguments given");
+   }
+
+// If path is specified, checks if path is valid 
+// and sets pointer to path
+if(words.size() == 2){
+   wordvec path = split(words.at(1),"/");   
+   if(words[1].at(0) == '/'){
+        tempdir = state.getroot();
+   }else{
+        tempdir = state.getcwd();
+   }
+   for(unsigned int i = 0; i < path.size(); i++){
+        map<string,inode_ptr> filelist = tempdir->getcontents()
+        ->getdirents();
+        std::map<std::string, inode_ptr>::iterator iter = 
+        filelist.begin();
+        bool foundfile = false;
+        while(iter != filelist.end()){
+                if(iter->first == path[i]){
+                        if(iter->second->getcontents()->
+                          checkifdir() == true){
+                                   foundfile = true;
+                                   tempdir = iter->second;
+                                   break;
+                        }else{
+                                   throw command_error("is a file");
+                        }
+                }
+                iter++;
         }
-        bool breakloop = false;
-        while(breakloop == false){
-              //  string direc;
+        if(foundfile == false){
+                throw command_error("directory does not exist");
         }
    }
-   
+   cwd = tempdir; 
+}
 
    map<string,inode_ptr> dirents = 
    cwd->getcontents()->getdirents();
    std::map<std::string, inode_ptr>::iterator it = dirents.begin();
-   cout << state.getcwd()->getpath() << ":" << endl;
+   cout << state.getpath() << ":" << endl;
    while(it != dirents.end()){
         int nodenumber =  it->second->get_inode_nr();
         int filesize = it->second->getcontents()->size();
@@ -225,7 +338,7 @@ void fn_make (inode_state& state, const wordvec& words){
    currdir->getcontents()->adddirents(name, newfileptr);
 }
 
-// mkdir command completei
+// mkdir command complete
 void fn_mkdir (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
@@ -256,7 +369,7 @@ void fn_mkdir (inode_state& state, const wordvec& words){
          newdirptr->getcontents()->setname(words[i]);
          newdirptr->setname(words[i]);
          newdirptr->getcontents()->adddirents(".", newdirptr);
-         newdirptr->getcontents()->adddirents("..", state.getroot()); 
+         newdirptr->getcontents()->adddirents("..", state.getcwd()); 
          cwd->getcontents()->adddirents(words[i], newdirptr);
    }
    //Throws error if name exists already, it is placed here
@@ -267,7 +380,7 @@ void fn_mkdir (inode_state& state, const wordvec& words){
    }
 }
 
-// Prompt command complete
+// prompt command complete
 void fn_prompt (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
@@ -277,8 +390,6 @@ void fn_prompt (inode_state& state, const wordvec& words){
         return;
    }
    //Changes prompt to given input
-   //**** WORDS IS A VECTOR OF WORDS, NOT CHARACTERS
-   //INDEX AT 1 NOT 0 ****
    for(unsigned int i = 1; i < words.size(); i++){
         newprompt += words[i] + " ";
    }
@@ -292,7 +403,7 @@ void fn_pwd (inode_state& state, const wordvec& words){
    DEBUGF ('c', words);
    //Takes inode state, gets inode pointer of cwd, then
    //retrieves path string of that inode
-   string output = state.getcwd()->getpath();
+   string output = state.getpath();
    cout << output << endl;
 }
 

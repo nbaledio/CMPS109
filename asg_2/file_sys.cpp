@@ -33,7 +33,6 @@ inode_state::inode_state() {
    root->getcontents()->adddirents(".", root);
    root->getcontents()->adddirents("..", root);
    cwd = root;
-   root->path = "/";
 }
 
 const string& inode_state::prompt() const { return prompt_; }
