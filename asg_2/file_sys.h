@@ -172,7 +172,7 @@ class directory: public base_file {
       virtual void remove (const string& filename) override;
       virtual inode_ptr mkdir (const string& dirname) override;
       virtual inode_ptr mkfile (const string& filename) override;
-      virtual void setname(string){}
+      virtual void setname(string input){name = input;}
       virtual string getname(){return name;}
       virtual map<string,inode_ptr> getdirents(){return dirents;}
       virtual void adddirents(string name1, inode_ptr ptr){

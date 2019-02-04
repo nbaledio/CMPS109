@@ -30,6 +30,8 @@ inode_state::inode_state() {
           << ", prompt = \"" << prompt() << "\"");
    //Creates root inode of type directory
    root = make_shared<inode>(file_type::DIRECTORY_TYPE);
+   root->getcontents()->adddirents(".", root);
+   root->getcontents()->adddirents("..", root);
    cwd = root;
    root->path = "/";
 }
@@ -95,7 +97,7 @@ inode_ptr plain_file::mkfile (const string&) {
 
 
 size_t directory::size() const {
-   size_t size {0};
+   int size = dirents.size();
    DEBUGF ('i', "size = " << size);
    return size;
 }
@@ -110,6 +112,7 @@ void directory::writefile (const wordvec&) {
 
 void directory::remove (const string& filename) {
    DEBUGF ('i', filename);
+   dirents.erase(filename);
 }
 
 inode_ptr directory::mkdir (const string& dirname) {
