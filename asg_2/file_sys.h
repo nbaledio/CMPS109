@@ -42,6 +42,10 @@ class inode_state {
       inode_state& operator= (const inode_state&) = delete; // op=
       inode_state();
       const string& prompt() const;
+      void setprompt(string input){prompt_ = input;} //Setter to change prompt
+      inode_ptr getroot(){return root;} //Getter for the root
+      inode_ptr getcwd(){return cwd;} //Getter for the directory
+      
 };
 
 // class inode -
@@ -63,9 +67,16 @@ class inode {
       static int next_inode_nr;
       int inode_nr;
       base_file_ptr contents;
+      string path;
+      string name;
    public:
       inode (file_type);
       int get_inode_nr() const;
+      string getpath(){return path;}
+      string getname() {return name;}
+      void setname(string input){name = input;}
+      base_file_ptr getcontents(){return contents;}
+      
 };
 
 
@@ -92,6 +103,11 @@ class base_file {
       virtual void remove (const string& filename) = 0;
       virtual inode_ptr mkdir (const string& dirname) = 0;
       virtual inode_ptr mkfile (const string& filename) = 0;
+      virtual void setname(string) = 0;
+      virtual string getname() = 0;
+      virtual map<string,inode_ptr> getdirents() = 0;
+      virtual void adddirents(string, inode_ptr) = 0;
+      virtual bool checkifdir() = 0;
 };
 
 // class plain_file -
@@ -104,8 +120,12 @@ class base_file {
 //    Replaces the contents of a file with new contents.
 
 class plain_file: public base_file {
+   friend ostream& operator<< (ostream& out, const inode_state&);
    private:
       wordvec data;
+      string name;
+      map<string,inode_ptr> dummy;
+      bool isdir = false;
    public:
       virtual size_t size() const override;
       virtual const wordvec& readfile() const override;
@@ -113,6 +133,11 @@ class plain_file: public base_file {
       virtual void remove (const string& filename) override;
       virtual inode_ptr mkdir (const string& dirname) override;
       virtual inode_ptr mkfile (const string& filename) override;
+      virtual void setname(string input){name = input;}
+      virtual string getname(){return name;}
+      virtual map<string,inode_ptr> getdirents(){return dummy;}
+      virtual void adddirents(string, inode_ptr){};
+      virtual bool checkifdir(){return isdir;}
 };
 
 // class directory -
@@ -134,9 +159,12 @@ class plain_file: public base_file {
 //    a dirent with that name exists.
 
 class directory: public base_file {
+   friend ostream& operator<< (ostream& out, const inode_state&);
    private:
       // Must be a map, not unordered_map, so printing is lexicographic
       map<string,inode_ptr> dirents;
+      string name;
+      bool isdir = true;
    public:
       virtual size_t size() const override;
       virtual const wordvec& readfile() const override;
@@ -144,6 +172,13 @@ class directory: public base_file {
       virtual void remove (const string& filename) override;
       virtual inode_ptr mkdir (const string& dirname) override;
       virtual inode_ptr mkfile (const string& filename) override;
+      virtual void setname(string){}
+      virtual string getname(){return name;}
+      virtual map<string,inode_ptr> getdirents(){return dirents;}
+      virtual void adddirents(string name1, inode_ptr ptr){
+      dirents.insert(std::pair<string, inode_ptr>(name1, ptr));
+      }
+      virtual bool checkifdir(){return isdir;} 
 };
 
 #endif

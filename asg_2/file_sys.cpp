@@ -28,6 +28,10 @@ ostream& operator<< (ostream& out, file_type type) {
 inode_state::inode_state() {
    DEBUGF ('i', "root = " << root << ", cwd = " << cwd
           << ", prompt = \"" << prompt() << "\"");
+   //Creates root inode of type directory
+   root = make_shared<inode>(file_type::DIRECTORY_TYPE);
+   cwd = root;
+   root->path = "/";
 }
 
 const string& inode_state::prompt() const { return prompt_; }
@@ -61,7 +65,7 @@ file_error::file_error (const string& what):
 }
 
 size_t plain_file::size() const {
-   size_t size {0};
+   int size = data.size();
    DEBUGF ('i', "size = " << size);
    return size;
 }
@@ -73,6 +77,8 @@ const wordvec& plain_file::readfile() const {
 
 void plain_file::writefile (const wordvec& words) {
    DEBUGF ('i', words);
+   data.clear();
+   data = words;
 }
 
 void plain_file::remove (const string&) {
