@@ -16,6 +16,7 @@ command_hash cmd_hash {
    {"prompt", fn_prompt},
    {"pwd"   , fn_pwd   },
    {"rm"    , fn_rm    },
+   {"rmr"   , fn_rmr   },
    {"#"     , fn_noth  },
 };
 
@@ -298,6 +299,7 @@ if(words.size() == 2){
 void fn_lsr (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   string resetname = state.getpath();
    if(words.size() > 1){}else{fn_ls(state, words);};
    inode_ptr cwdir = state.getcwd();
    map<string,inode_ptr> cdirents1 = cwdir->getcontents()->getdirents();
@@ -319,6 +321,7 @@ void fn_lsr (inode_state& state, const wordvec& words){
          it++;
    }
    state.setcwd(cwdir);
+   state.setpath(resetname);
 }
 
 // make command complete
@@ -488,8 +491,64 @@ void fn_rm (inode_state& state, const wordvec& words){
    }
 }
 
+// rmr command complete
 void fn_rmr (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   inode_ptr cwd = state.getcwd();
+   string resetname = state.getpath();
+   map<string,inode_ptr> cdirents1 = cwd->getcontents()->getdirents();
+   std::map<std::string, inode_ptr>::iterator it = cdirents1.begin();
+   if(words.size() > 2){
+        wordvec changedir;
+        changedir.push_back("cd");
+        changedir.push_back(words[1]);
+        fn_cd(state, changedir);
+        wordvec blank;
+        blank.push_back("");
+        fn_rmr(state,blank);
+   }
+   while(it != cdirents1.end()){
+        //If is it a plain file
+        if(it->second->getcontents()->checkifdir()==false){
+                wordvec remover;
+                remover.push_back("rm");
+                remover.push_back(it->first);
+                fn_rm(state, remover);
+        //If it is a directory
+        }else{
+                if(it->first == "." || it->first == ".."){
+                        it++;
+                        continue;
+                }
+                //If directory is not empty
+                if(it->second->getcontents()->size() > 2){
+                        wordvec changer;
+                        changer.push_back("cd");
+                        changer.push_back(it->first);
+                        wordvec blank2;
+                        blank2.push_back("");
+                        fn_cd(state,changer);
+                        fn_rmr(state,blank2);
+                        wordvec original;
+                        original.push_back("cd");
+                        original.push_back("..");
+                        fn_cd(state, original);
+                        wordvec remover3;
+                        remover3.push_back("rm");
+                        remover3.push_back(it->first);
+                        fn_rm(state, remover3);
+                //If directory is empty
+                }else{
+                        wordvec remover2;
+                        remover2.push_back("rm");
+                        remover2.push_back(it->first);
+                        fn_rm(state, remover2);
+                } 
+        }
+        it++;
+   }
+   state.setpath(resetname);
+   state.setcwd(cwd);
 }
 
