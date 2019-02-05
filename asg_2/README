@@ -1,1 +1,20 @@
-README
+Nathan Baledio
+ID: 1574354
+CruzID: nbaledio
+_ _ _ _ _ _ _ _ _
+
+Files included:
+commands.cpp
+commands.h
+debug.cpp
+debug.h
+file_sys.cpp
+file_sys.h
+main.cpp
+util.cpp
+util.h
+
+NOTES:
+-I didn't format error messages to any particual structure.
+They will be thrown, but the messages may differ from that of
+an actual unix shell

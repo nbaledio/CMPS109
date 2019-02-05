@@ -1,5 +1,6 @@
 // $Id: file_sys.h,v 1.6 2018-06-27 14:44:57-07 - - $
-
+// Nathan Baledio
+// ID: 157454
 #ifndef __INODE_H__
 #define __INODE_H__
 
