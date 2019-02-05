@@ -429,6 +429,13 @@ void fn_rm (inode_state& state, const wordvec& words){
         filefound = false;
         while(it != cdirents1.end()){
                 if(it->first == words[i]){
+                        if(it->second->getcontents()->
+                        checkifdir()==true){
+                             if(it->second->getcontents()->size() > 2){
+                                    throw command_error
+                                    ("directory is not empty");
+                             }
+                        }
                         filefound = true;
                         cwd->getcontents()->remove(words[i]);
                         break;
