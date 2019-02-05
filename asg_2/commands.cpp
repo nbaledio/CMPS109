@@ -40,7 +40,6 @@ int exit_status_message() {
    return exit_status;
 }
 
-// ACTUALLY GO BACK AND MAKE IT LOOP THROUGH MULTIPLE ARGUMENTS
 // cat command complete
 void fn_cat (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
@@ -49,6 +48,7 @@ void fn_cat (inode_state& state, const wordvec& words){
    if(words.size() == 1){
         throw command_error("error: no file name given");
    }
+
    //Iterates through directory to find any file of the given name
    inode_ptr cwdir = state.getcwd();
    map<string,inode_ptr> cdirents = cwdir->getcontents()->getdirents();
@@ -198,7 +198,6 @@ void fn_exit (inode_state& state, const wordvec& words){
    throw ysh_exit();
 }
 
-//CHANGE FORMAT EX: .:
 // ls command complete
 void fn_ls (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
@@ -247,7 +246,13 @@ if(words.size() == 2){
    map<string,inode_ptr> dirents = 
    cwd->getcontents()->getdirents();
    std::map<std::string, inode_ptr>::iterator it = dirents.begin();
-   cout << state.getpath() << ":" << endl;
+   string dname;
+   if(words.size() == 1){
+        dname = state.getpath();
+   }else{
+        dname = words[1];
+   }
+   cout << dname << ":" << endl;
    while(it != dirents.end()){
         int nodenumber =  it->second->get_inode_nr();
         int filesize = it->second->getcontents()->size();
