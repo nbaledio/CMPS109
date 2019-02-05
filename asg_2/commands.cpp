@@ -16,6 +16,7 @@ command_hash cmd_hash {
    {"prompt", fn_prompt},
    {"pwd"   , fn_pwd   },
    {"rm"    , fn_rm    },
+   {"#"     , fn_noth  },
 };
 
 command_fn find_command_fn (const string& cmd) {
@@ -38,6 +39,11 @@ int exit_status_message() {
    int exit_status = exit_status::get();
    cout << execname() << ": exit(" << exit_status << ")" << endl;
    return exit_status;
+}
+
+void fn_noth(inode_state& state, const wordvec& words){
+wordvec words2 = words;
+inode_ptr state2 = state.getroot();
 }
 
 // cat command complete
