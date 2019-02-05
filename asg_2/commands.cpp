@@ -294,9 +294,31 @@ if(words.size() == 2){
    } 
 }
 
+// lsr command complete
 void fn_lsr (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   if(words.size() > 1){}else{fn_ls(state, words);};
+   inode_ptr cwdir = state.getcwd();
+   map<string,inode_ptr> cdirents1 = cwdir->getcontents()->getdirents();
+   std::map<std::string, inode_ptr>::iterator it = cdirents1.begin();
+   while(it != cdirents1.end()){
+         if(it->first == "." || it->first == ".."){
+                it++;
+                continue;
+         }
+         if(it->second->getcontents()->checkifdir()==true){
+                wordvec newvec;
+                newvec.push_back("cd");
+                newvec.push_back(it->first);
+                wordvec blank;
+                blank.push_back("");
+                fn_cd(state, newvec);
+                fn_lsr(state, blank);
+         }
+         it++;
+   }
+   state.setcwd(cwdir);
 }
 
 // make command complete
@@ -408,7 +430,7 @@ void fn_prompt (inode_state& state, const wordvec& words){
    state.inode_state::setprompt(newprompt);
 }
 
-// pwd command (THEORETICALLY COMPLETE)
+// pwd command complete
 void fn_pwd (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
@@ -442,6 +464,15 @@ void fn_rm (inode_state& state, const wordvec& words){
                                     ("directory is not empty");
                              }
                         }
+                       if(words[i] == ".."){
+                             throw command_error("cannot remove ..");  
+                       }
+                       if(words[i] == "." ){
+                             throw command_error("cannot remove .");
+                       }
+                       if(words[i] == "/"){
+                             throw command_error("cannot remove /");
+                       }
                         filefound = true;
                         cwd->getcontents()->remove(words[i]);
                         break;

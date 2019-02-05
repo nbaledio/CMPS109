@@ -43,7 +43,7 @@ class inode_state {
       inode_state& operator= (const inode_state&) = delete; // op=
       inode_state();
       const string& prompt() const;
-      void setprompt(string input){prompt_ = input;} //Setter to change prompt
+      void setprompt(string input){prompt_ = input;} //Promt setter
       inode_ptr getroot(){return root;} //Getter for the root
       inode_ptr getcwd(){return cwd;} //Getter for the directory
       void setcwd(inode_ptr newcwd){cwd = newcwd;}

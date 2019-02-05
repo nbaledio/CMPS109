@@ -66,7 +66,14 @@ file_error::file_error (const string& what):
 }
 
 size_t plain_file::size() const {
-   int size = data.size();
+   int size = 0;
+   for(unsigned int i = 0; i < data.size(); i++){
+        size += data[i].length();
+        if(i == data.size() - 1){
+        }else{
+                size++;
+        }
+   }
    DEBUGF ('i', "size = " << size);
    return size;
 }

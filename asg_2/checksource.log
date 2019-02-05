@@ -1,3 +1,0 @@
-checksource: line length > 72 characters
-   file "file_sys.h": 1 errors: line 46
-checksource: TOTAL COMPLAINTS: 1

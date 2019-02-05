@@ -79,7 +79,6 @@ int main (int argc, char** argv) {
    } catch (ysh_exit&) {
       // This catch intentionally left blank.
    }
-
    return exit_status_message();
 }
 
