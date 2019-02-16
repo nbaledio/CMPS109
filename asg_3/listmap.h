@@ -15,6 +15,7 @@ class listmap {
    private:
       Less less;
       struct node;
+      node* head;
       struct link {
          node* next{};
          node* prev{};

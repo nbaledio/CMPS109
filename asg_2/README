@@ -18,3 +18,4 @@ NOTES:
 -I didn't format error messages to any particual structure.
 They will be thrown, but the messages may differ from that of
 an actual unix shell
+-I did not work in a pair for this assignment
