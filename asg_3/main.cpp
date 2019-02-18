@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include <fstream>
+#include <sstream>
+#include <regex>
 
 using namespace std;
 
@@ -33,7 +36,58 @@ void scan_options (int argc, char** argv) {
 }
 
 int main (int argc, char** argv) {
-   sys_info::execname (argv[0]);
+  if (argc == 0){
+
+  }
+  str_str_map map;
+  fstream file;
+  std:: string line;
+  file.open(argv[1]);
+  smatch match;
+
+  regex empty{("\\s*")};
+  regex comment{("^\\s*#.*$")};
+  regex key{("^\\s*[^#.*=]*[^=]$")};
+  regex key_equals{("(^\\s*[^=]+)=\\s*$")};
+  regex key_equals_value{("(^\\s*[^=]+)=(\\s*\\S.*)$")};
+  regex equals{("^\\s*=\\s*$")};
+  regex equals_value{("^\\s*=(\\s*\\S.*$)")};
+
+  map.initialize();
+  while(std::getline(file,line)){
+        if(regex_search(line,match,comment)){
+               //Echo
+               continue;
+        }
+        if(regex_search(line,match,key)){
+               if(map.find(match[0]) == map.end()){
+                        //throw error
+               }else{
+                        cout << map.find(match[0])->first << endl;
+                        cout << map.find(match[0])->second << endl;
+               }
+        }
+        if(regex_search(line,match,key_equals)){
+               if(map.find(match[1]) != map.end()){
+                        map.erase(map.find(match[1]));
+               }
+               continue;
+        }
+        if(regex_search(line,match,key_equals_value)){
+                str_str_pair pair(match[1],match[2]);
+                map.insert(pair);
+                continue;
+        }
+        if(regex_search(line,match,equals)){
+                map.print();
+                continue;
+        }
+        if(regex_search(line,match,equals_value)){
+               map.print_value(match[1]);
+               continue;
+        } 
+  }
+  /* sys_info::execname (argv[0]);
    scan_options (argc, argv);
 
    str_str_map test;
@@ -51,7 +105,7 @@ int main (int argc, char** argv) {
    str_str_map::iterator itor = test.begin();
    test.erase (itor);
 
-   cout << "EXIT_SUCCESS" << endl;
+   cout << "EXIT_SUCCESS" << endl;*/
    return EXIT_SUCCESS;
 }
 

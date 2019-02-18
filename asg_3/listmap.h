@@ -15,14 +15,19 @@ class listmap {
    private:
       Less less;
       struct node;
+      node front;
+      node mapend;
       node* head;
+      node* back;
       struct link {
          node* next{};
          node* prev{};
+         link(){};
          link (node* next, node* prev): next(next), prev(prev){}
       };
       struct node: link {
          value_type value{};
+         node(){};
          node (node* next, node* prev, const value_type&);
       };
       node* anchor() { return static_cast<node*> (&anchor_); }
@@ -36,9 +41,34 @@ class listmap {
       iterator insert (const value_type&);
       iterator find (const key_type&);
       iterator erase (iterator position);
-      iterator begin() { return anchor()->next; }
-      iterator end() { return anchor(); }
+      void print(){
+        node* iter = head->next;
+        while(iter != back){
+                cout << iter->value.first << endl;
+                iter = iter->next;
+        }
+      }
+      void print_value(string that){
+        node* iter = head->next;
+        while(iter != back){
+        if(iter->value.second == that){
+                cout << iter->value.first << " "
+                << iter->value.second << endl;
+        }
+        iter = iter->next;
+        }
+      }
+      iterator begin() { return head; }
+      iterator end() { return back; }
       bool empty() const { return begin() == end(); }
+      void initialize(){
+      front.next = &mapend;
+      front.prev = &mapend;
+      mapend.next = &front;
+      mapend.prev = &front;
+      head = &front;
+      back = &mapend;
+      }
 };
 
 

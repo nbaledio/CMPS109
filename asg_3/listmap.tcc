@@ -32,7 +32,7 @@ listmap<Key,Value,Less>::~listmap() {
    DEBUGF ('l', reinterpret_cast<const void*> (this));
 }
 
-//INSERT IN PROGRESS: TEST TO SEE IF IT WORKS
+//Insert completed
 
 //
 // iterator listmap::insert (const value_type&)
@@ -42,41 +42,47 @@ typename listmap<Key,Value,Less>::iterator
 listmap<Key,Value,Less>::insert (const value_type& pair) {
    DEBUGF ('l', &pair << "->" << pair);
    //Searches for key to see if it exists and overwrites value
-   if(find(pair.first) != anchor()){
+   if(find(pair.first) != back){
         find(pair.first)->second = pair.second;
         return find(pair.first);
    }
    //Checks if list is empty and inserts it between head and anchor
-   if(head->next == anchor()){
-        node* newnode = new node(head,anchor(),pair);
+   if(head->next == back){
+        node* newnode = new node(back,head,pair);
         head->next = newnode;
-        anchor()->prev = newnode;
+        back->prev = newnode;
         return newnode; 
    }
-   node* it = head;
+   node* it = head->next;
    //Inserts new node lexicohraphically
-   while(it != anchor()){
-        if(less(pair.first,it->value.first)){
-                node* newnode = new node(it->prev,it,pair);
+   while(it != back){
+        if(std::string(pair.first)<std::string(it->value.first)){
+                node* newnode = new node(it,it->prev,pair);
                 it->prev->next = newnode;
                 it->prev = newnode;
                 return newnode;
         }
         it = it->next;
+        if(it == back){
+                node* largest = new node(back,back->prev,pair);
+                back->prev->next = largest;
+                back->prev = largest;
+                return largest;
+        }
    }
-   return anchor();;
+   return end();
 }
 
-// FIND IN PROGRESS: CHECK TO SEE IF IT WORKS
+// Find completed
 //
 // listmap::find(const key_type&)
 //
 template <typename Key, typename Value, class Less>
 typename listmap<Key,Value,Less>::iterator
 listmap<Key,Value,Less>::find (const key_type& that) {
-   DEBUGF ('l', that);
-   node* it = head;
-   while(it != anchor()){
+  DEBUGF ('l', that);
+   node* it = head->next;
+   while(it != back){
         if(it->value.first == that){
                 return it;
         }
@@ -85,7 +91,7 @@ listmap<Key,Value,Less>::find (const key_type& that) {
    return end();
 }
 
-//ERASE IN PROGRESS: CHECK TO SEE IF IT WORKS
+//Erase completed
 //
 // iterator listmap::erase (iterator position)
 //
@@ -99,7 +105,6 @@ listmap<Key,Value,Less>::erase (iterator position) {
    delete position.where;
    return it;
 }
-
 
 //
 /////////////////////////////////////////////////////////////////
