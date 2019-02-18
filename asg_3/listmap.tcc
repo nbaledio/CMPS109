@@ -56,7 +56,8 @@ listmap<Key,Value,Less>::insert (const value_type& pair) {
    node* it = head->next;
    //Inserts new node lexicohraphically
    while(it != back){
-        if(std::string(pair.first)<std::string(it->value.first)){
+//std::string(pair.first)<std::string(it->value.first)
+        if(less(pair.first,it->value.first)==true){
                 node* newnode = new node(it,it->prev,pair);
                 it->prev->next = newnode;
                 it->prev = newnode;

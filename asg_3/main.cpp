@@ -35,6 +35,28 @@ void scan_options (int argc, char** argv) {
    }
 }
 
+string trimstring(string word){
+   for(unsigned int i = 0; i < word.length(); i++){
+      if(word.at(i) == 32 ){
+          word.erase(i,1);
+          i = -1;
+          continue;
+      }else{
+          break;
+      }
+   }
+   for(unsigned int i = word.length()-1; i>0; i--){
+      if(word.at(i) == 32 ){
+          word.erase(i,1);
+          i = word.length();
+          continue;
+      }else{
+          break;
+      }
+   }
+return word;
+}
+
 int main (int argc, char** argv) {
   if (argc == 0){
 
@@ -44,8 +66,10 @@ int main (int argc, char** argv) {
   std:: string line;
   file.open(argv[1]);
   smatch match;
+  string arg;
+  string arg2;
 
-  regex empty{("\\s*")};
+  regex empty{("\\s*")};//Probably don't even need a regex for empty
   regex comment{("^\\s*#.*$")};
   regex key{("^\\s*[^#.*=]*[^=]$")};
   regex key_equals{("(^\\s*[^=]+)=\\s*$")};
@@ -54,27 +78,45 @@ int main (int argc, char** argv) {
   regex equals_value{("^\\s*=(\\s*\\S.*$)")};
 
   map.initialize();
+  int linenum = 0;
   while(std::getline(file,line)){
+        linenum++;
+        cout << argv[1] << ": " << linenum << ": " << line << endl;
         if(regex_search(line,match,comment)){
-               //Echo
                continue;
         }
         if(regex_search(line,match,key)){
-               if(map.find(match[0]) == map.end()){
-                        //throw error
+               arg = match[0];
+               arg = trimstring(arg);
+               if(map.find(arg) == map.end()){
+                        try{
+                        string error = arg;
+                        throw runtime_error(error + 
+                        ": key not found");
+                        }
+                        catch (runtime_error err)
+                        {cerr << err.what() << endl;}
+                        continue;
                }else{
-                        cout << map.find(match[0])->first << endl;
-                        cout << map.find(match[0])->second << endl;
+                        cout << map.find(arg)->first << " = "
+                        << map.find(arg)->second << endl;
                }
         }
         if(regex_search(line,match,key_equals)){
-               if(map.find(match[1]) != map.end()){
-                        map.erase(map.find(match[1]));
+               arg = match[1];
+               arg = trimstring(arg);
+               if(map.find(arg) != map.end()){
+                        map.erase(map.find(arg));
                }
                continue;
         }
         if(regex_search(line,match,key_equals_value)){
-                str_str_pair pair(match[1],match[2]);
+                arg = match[1];
+                arg2 = match[2];
+                arg = trimstring(arg);
+                arg2 = trimstring(arg2);
+                cout << arg << " = " << arg2 << endl;
+                str_str_pair pair(arg,arg2);
                 map.insert(pair);
                 continue;
         }
@@ -83,7 +125,9 @@ int main (int argc, char** argv) {
                 continue;
         }
         if(regex_search(line,match,equals_value)){
-               map.print_value(match[1]);
+               arg = match[1];
+               arg = trimstring(arg);
+               map.print_value(arg);
                continue;
         } 
   }

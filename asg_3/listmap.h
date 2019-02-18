@@ -44,7 +44,8 @@ class listmap {
       void print(){
         node* iter = head->next;
         while(iter != back){
-                cout << iter->value.first << endl;
+                cout << iter->value.first << " = " << 
+                iter->value.second << endl;
                 iter = iter->next;
         }
       }
@@ -52,7 +53,7 @@ class listmap {
         node* iter = head->next;
         while(iter != back){
         if(iter->value.second == that){
-                cout << iter->value.first << " "
+                cout << iter->value.first << " = "
                 << iter->value.second << endl;
         }
         iter = iter->next;

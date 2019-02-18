@@ -6,10 +6,8 @@ f2=52
 foobar=baz
 baz=quux
 this=is=a=test
+=
 a=value
 b=value
-a=
-=
-foo=
-=
 =value
+# $Id: test2.in,v 1.1 2016-06-28 14:48:38-07 - - $
