@@ -140,13 +140,67 @@ if(argc != 1){
   }
 }
 
+return 0;
+
 cin_loop:
    string userinput;
    cin >> userinput;
-   while (userinput != "Exit"){
+   int linenumber = 0;
+   while (userinput != "exit"){
+	    line = userinput;
+		linenumber++;
+		cout << "cin: " << linenumber << ": " << line << endl;
         if(userinput == "h"){
              return 1;
         }
+		if(regex_search(line,match,comment)){
+               continue;
+        }
+        if(regex_search(line,match,key)){
+               arg = match[0];
+               arg = trimstring(arg);
+               if(map.find(arg) == map.end()){
+                        try{
+                        string error = arg;
+                        throw runtime_error(error + 
+                        ": key not found");
+                        }
+                        catch (runtime_error err)
+                        {cerr << err.what() << endl;}
+                        continue;
+               }else{
+                        cout << map.find(arg)->first << " = "
+                        << map.find(arg)->second << endl;
+               }
+        }
+        if(regex_search(line,match,key_equals)){
+               arg = match[1];
+               arg = trimstring(arg);
+               if(map.find(arg) != map.end()){
+                        map.erase(map.find(arg));
+               }
+               continue;
+        }
+        if(regex_search(line,match,key_equals_value)){
+                arg = match[1];
+                arg2 = match[2];
+                arg = trimstring(arg);
+                arg2 = trimstring(arg2);
+                cout << arg << " = " << arg2 << endl;
+                str_str_pair pair(arg,arg2);
+                map.insert(pair);
+                continue;
+        }
+        if(regex_search(line,match,equals)){
+                map.print();
+                continue;
+        }
+        if(regex_search(line,match,equals_value)){
+               arg = match[1];
+               arg = trimstring(arg);
+               map.print_value(arg);
+               continue;
+        } 
         cin >> userinput;
    }
   /* sys_info::execname (argv[0]);
