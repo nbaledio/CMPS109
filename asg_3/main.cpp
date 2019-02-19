@@ -58,7 +58,12 @@ return word;
 }
 
 int main (int argc, char** argv) {
+  
+if(argc == 1){
+  goto cin_loop;
+}
 
+if(argc > 1){
   str_str_map map;
   fstream file;
   std:: string line;
@@ -73,7 +78,6 @@ int main (int argc, char** argv) {
   regex equals{("^\\s*=\\s*$")};
   regex equals_value{("^\\s*=(\\s*\\S.*$)")};
 
-if(argc != 1){
   //Loop to handle file inputs
   for(int i = 1; i < argc; i++){
   map.initialize();
@@ -139,22 +143,33 @@ if(argc != 1){
    map.~listmap();
   }
 }
-
 return 0;
-
 cin_loop:
-   string userinput;
-   cin >> userinput;
-   int linenumber = 0;
-   while (userinput != "exit"){
-	    line = userinput;
-		linenumber++;
-		cout << "cin: " << linenumber << ": " << line << endl;
-        if(userinput == "h"){
-             return 1;
-        }
-		if(regex_search(line,match,comment)){
-               continue;
+  str_str_map map;
+  std:: string line;
+  smatch match;
+  string arg;
+  string arg2;
+
+  regex comment{("^\\s*#.*$")};
+  regex key{("^\\s*[^#.*=]*[^=]$")};
+  regex key_equals{("(^\\s*[^=]+)=\\s*$")};
+  regex key_equals_value{("(^\\s*[^=]+)=(\\s*\\S.*)$")};
+  regex equals{("^\\s*=\\s*$")};
+  regex equals_value{("^\\s*=(\\s*\\S.*$)")};
+
+  map.initialize();
+  string userinput;
+  getline(cin, userinput);
+  int linenumber = 0;
+  char eot = 4;
+  string end = "" + eot;
+  while (userinput != end){
+        line = userinput;
+        linenumber++;
+        cout << "-: " << linenumber << ": " << line << endl;
+        if(regex_search(line,match,comment)){
+               // continue;
         }
         if(regex_search(line,match,key)){
                arg = match[0];
@@ -167,7 +182,7 @@ cin_loop:
                         }
                         catch (runtime_error err)
                         {cerr << err.what() << endl;}
-                        continue;
+                       // continue;
                }else{
                         cout << map.find(arg)->first << " = "
                         << map.find(arg)->second << endl;
@@ -179,7 +194,7 @@ cin_loop:
                if(map.find(arg) != map.end()){
                         map.erase(map.find(arg));
                }
-               continue;
+              // continue;
         }
         if(regex_search(line,match,key_equals_value)){
                 arg = match[1];
@@ -189,20 +204,22 @@ cin_loop:
                 cout << arg << " = " << arg2 << endl;
                 str_str_pair pair(arg,arg2);
                 map.insert(pair);
-                continue;
+               // continue;
         }
         if(regex_search(line,match,equals)){
                 map.print();
-                continue;
+               // continue;
         }
         if(regex_search(line,match,equals_value)){
                arg = match[1];
                arg = trimstring(arg);
                map.print_value(arg);
-               continue;
+              // continue;
         } 
-        cin >> userinput;
+        getline(cin, userinput);
    }
+   map.~listmap();
+
   /* sys_info::execname (argv[0]);
    scan_options (argc, argv);
 
