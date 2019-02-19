@@ -1,5 +1,6 @@
 // $Id: debug.h,v 1.1 2018-01-25 14:09:09-08 - - $
-
+// Nathan Baledio
+// ID: 157454
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 

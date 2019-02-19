@@ -1,5 +1,6 @@
 // $Id: util.h,v 1.6 2018-01-25 14:18:43-08 - - $
-
+// Nathan Baledio
+// ID: 157454
 //
 // util -
 //    A utility class to provide various services not conveniently
