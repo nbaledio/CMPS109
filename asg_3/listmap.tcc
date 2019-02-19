@@ -25,11 +25,16 @@ listmap<Key,Value,Less>::node::node (node* next, node* prev,
 //
 
 //
-// listmap::~listmap()
+// listmap::~listmap() Destructor
 //
 template <typename Key, typename Value, class Less>
 listmap<Key,Value,Less>::~listmap() {
    DEBUGF ('l', reinterpret_cast<const void*> (this));
+   node* it = head->next;
+   while(it != back){
+        erase(it);
+        it = head->next;
+   }
 }
 
 //Insert completed

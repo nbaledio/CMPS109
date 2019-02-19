@@ -58,18 +58,14 @@ return word;
 }
 
 int main (int argc, char** argv) {
-  if (argc == 0){
 
-  }
   str_str_map map;
   fstream file;
   std:: string line;
-  file.open(argv[1]);
   smatch match;
   string arg;
   string arg2;
 
-  regex empty{("\\s*")};//Probably don't even need a regex for empty
   regex comment{("^\\s*#.*$")};
   regex key{("^\\s*[^#.*=]*[^=]$")};
   regex key_equals{("(^\\s*[^=]+)=\\s*$")};
@@ -77,11 +73,22 @@ int main (int argc, char** argv) {
   regex equals{("^\\s*=\\s*$")};
   regex equals_value{("^\\s*=(\\s*\\S.*$)")};
 
+  if(argc == 1){
+       goto cin_loop;
+  }
+//
+  //Loop to handle file inputs
+  for(int i = 1; i < argc; i++){
   map.initialize();
   int linenum = 0;
+  string argument = argv[i];
+  if(argument == "-"){
+        break;
+  }
+  file.open(argv[i]);
   while(std::getline(file,line)){
         linenum++;
-        cout << argv[1] << ": " << linenum << ": " << line << endl;
+        cout << argv[i] << ": " << linenum << ": " << line << endl;
         if(regex_search(line,match,comment)){
                continue;
         }
@@ -130,7 +137,13 @@ int main (int argc, char** argv) {
                map.print_value(arg);
                continue;
         } 
+   }
+   file.close();
+   map.~listmap();
   }
+
+cin_loop:
+//MAKE 2ND HALF TO HANDLE CIN
   /* sys_info::execname (argv[0]);
    scan_options (argc, argv);
 
