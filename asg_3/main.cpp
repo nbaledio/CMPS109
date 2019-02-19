@@ -73,17 +73,14 @@ int main (int argc, char** argv) {
   regex equals{("^\\s*=\\s*$")};
   regex equals_value{("^\\s*=(\\s*\\S.*$)")};
 
-  if(argc == 1){
-       goto cin_loop;
-  }
-//
+if(argc != 1){
   //Loop to handle file inputs
   for(int i = 1; i < argc; i++){
   map.initialize();
   int linenum = 0;
   string argument = argv[i];
   if(argument == "-"){
-        break;
+        goto cin_loop;
   }
   file.open(argv[i]);
   while(std::getline(file,line)){
@@ -141,9 +138,17 @@ int main (int argc, char** argv) {
    file.close();
    map.~listmap();
   }
+}
 
 cin_loop:
-//MAKE 2ND HALF TO HANDLE CIN
+   string userinput;
+   cin >> userinput;
+   while (userinput != "Exit"){
+        if(userinput == "h"){
+             return 1;
+        }
+        cin >> userinput;
+   }
   /* sys_info::execname (argv[0]);
    scan_options (argc, argv);
 
