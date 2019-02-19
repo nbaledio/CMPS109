@@ -35,6 +35,12 @@ void scan_options (int argc, char** argv) {
    }
 }
 
+bool is_file_exist(const char *fileName)
+{
+    std::ifstream infile(fileName);
+    return infile.good();
+}
+
 string trimstring(string word){
    for(unsigned int i = 0; i < word.length(); i++){
       if(word.at(i) == 32 ){
@@ -63,6 +69,7 @@ if(argc == 1){
   goto cin_loop;
 }
 
+
 if(argc > 1){
   str_str_map map;
   fstream file;
@@ -80,6 +87,16 @@ if(argc > 1){
 
   //Loop to handle file inputs
   for(int i = 1; i < argc; i++){
+  if(is_file_exist(argv[i])==false){
+        try{
+                string cerrout = argv[i];
+                throw runtime_error
+                (cerrout + ": No such file or directory");
+        }
+        catch(runtime_error err){
+                cerr << err.what() << endl;
+        }
+  }
   map.initialize();
   int linenum = 0;
   string argument = argv[i];

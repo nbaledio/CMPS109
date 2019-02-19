@@ -1,1 +1,2 @@
-./mk.tests: line 9: ./keyvalue: Permission denied
+/no/such: No such file or directory
+no//file/either: No such file or directory
