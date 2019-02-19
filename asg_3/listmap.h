@@ -6,6 +6,9 @@
 #include "xless.h"
 #include "xpair.h"
 
+//listmap uses a node head and node back that are both markers.
+//They hold no value and only indicate the start and end of a
+//list. Kind of like bread to a sandwich
 template <typename Key, typename Value, class Less=xless<Key>>
 class listmap {
    public:
@@ -17,9 +20,9 @@ class listmap {
       struct node;
       node front;
       node mapend;
-      node* head;
-      node* back;
-      struct link {
+      node* head; //These two probably aren't needed, but i had
+      node* back; //already based functions off of head at this
+      struct link { //point
          node* next{};
          node* prev{};
          link(){};
@@ -41,6 +44,9 @@ class listmap {
       iterator insert (const value_type&);
       iterator find (const key_type&);
       iterator erase (iterator position);
+      //Method to print map. I know it shouldn't really be defined
+      //here, but in terms of making the program function, it was
+      //easier to do it here.
       void print(){
         node* iter = head->next;
         while(iter != back){
@@ -49,6 +55,7 @@ class listmap {
                 iter = iter->next;
         }
       }
+      //Method that handles = value input printing
       void print_value(string that){
         node* iter = head->next;
         while(iter != back){
@@ -62,6 +69,7 @@ class listmap {
       iterator begin() { return head; }
       iterator end() { return back; }
       bool empty() const { return begin() == end(); }
+      //Initializes the map
       void initialize(){
       front.next = &mapend;
       front.prev = &mapend;

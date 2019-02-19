@@ -1,0 +1,23 @@
+Nathan Baledio
+ID: 1574354
+CruzID: nbaledio
+----------------
+
+Files included:
+1. Makefile
+2. debug.cpp
+3. debug.h
+4. listmap.h
+5. listmap.tcc
+6. main.cpp
+7. util.cpp
+8. util.h
+9. util.tcc
+10. xless.h
+11. xpair.h
+
+NOTES:
+-I did not do pair programming for this assignment
+-Some functions included in listmap.tcc I did not use (ex: anchor()).
+This was more of a personal preference so I could make my own functions
+to keep it organized.

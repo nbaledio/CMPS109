@@ -41,6 +41,8 @@ bool is_file_exist(const char *fileName)
     return infile.good();
 }
 
+
+//My method. Trims leading.trailing whitespace off of inputs
 string trimstring(string word){
    for(unsigned int i = 0; i < word.length(); i++){
       if(word.at(i) == 32 ){
@@ -64,13 +66,15 @@ return word;
 }
 
 int main (int argc, char** argv) {
-  
+
+//Checks if no arguments are given and jumps to cin loop if true  
 if(argc == 1){
   goto cin_loop;
 }
 
-
+//Handles the case of a file name given
 if(argc > 1){
+  //Initializes elements being used for map
   str_str_map map;
   fstream file;
   std:: string line;
@@ -78,6 +82,7 @@ if(argc > 1){
   string arg;
   string arg2;
 
+  //Regex list for different types of inputs
   regex comment{("^\\s*#.*$")};
   regex key{("^\\s*[^#.*=]*[^=]$")};
   regex key_equals{("(^\\s*[^=]+)=\\s*$")};
@@ -87,6 +92,7 @@ if(argc > 1){
 
   //Loop to handle file inputs
   for(int i = 1; i < argc; i++){
+  //Checks if file exists and throws an error if it doesn't
   if(is_file_exist(argv[i])==false){
         try{
                 string cerrout = argv[i];
@@ -97,13 +103,16 @@ if(argc > 1){
                 cerr << err.what() << endl;
         }
   }
+  //Initializes map
   map.initialize();
   int linenum = 0;
   string argument = argv[i];
+  //Breaks to cin if argument is "-"
   if(argument == "-"){
         goto cin_loop;
   }
   file.open(argv[i]);
+  //Loop that reads input line-by-line and responds accordingly
   while(std::getline(file,line)){
         linenum++;
         cout << argv[i] << ": " << linenum << ": " << line << endl;
@@ -156,18 +165,22 @@ if(argc > 1){
                continue;
         } 
    }
+   //Closes file, and destructs map for next iteration
    file.close();
    map.~listmap();
   }
 }
 return 0;
+//Loop that handles input from cin
 cin_loop:
+  //Initializes elements being used for map
   str_str_map map;
   std:: string line;
   smatch match;
   string arg;
   string arg2;
 
+  //Regex list for possible inputs
   regex comment{("^\\s*#.*$")};
   regex key{("^\\s*[^#.*=]*[^=]$")};
   regex key_equals{("(^\\s*[^=]+)=\\s*$")};
@@ -181,6 +194,10 @@ cin_loop:
   int linenumber = 0;
   char eot = 4;
   string end = "" + eot;
+
+  //Loop that handles cin inputs until an EOT character is input
+  //Unlike the file loop, continues are disabled so loop can
+  //take a new input at the end.
   while (userinput != end){
         line = userinput;
         linenumber++;
@@ -235,6 +252,7 @@ cin_loop:
         } 
         getline(cin, userinput);
    }
+   //Destructs map
    map.~listmap();
 
   /* sys_info::execname (argv[0]);
