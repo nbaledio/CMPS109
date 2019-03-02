@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <sstream>
+#include <fstream>
 using namespace std;
 
 #include <libgen.h>
@@ -22,6 +24,7 @@ unordered_map<string,cix_command> command_map {
    {"exit", cix_command::EXIT},
    {"help", cix_command::HELP},
    {"ls"  , cix_command::LS  },
+   {"get" , cix_command::GET },
 };
 
 static const string help = R"||(
@@ -33,10 +36,36 @@ put filename - Copy local file to remote host.
 rm filename  - Remove file from remote server.
 )||";
 
+//get command : In Progress
+void cix_get(client_socket& server, string filename){
+   cix_header header;
+   //strcpy(header.filename, filename.c_str()); <- Use snprintf
+   snprintf(header.filename,sizeof(header.filename),filename.c_str());
+   header.command = cix_command::GET;
+   log << "sending header " << header << endl;
+   send_packet (server, &header, sizeof header);
+   recv_packet (server, &header, sizeof header);
+   log << "received header " << header << endl;
+   if(header.command != cix_command::FILEOUT){
+       log << "sent GET, server did not return FILEOUT" << endl;
+       log << "server returned " << header << endl;
+   }else{
+      char* buffer = new char[header.nbytes];
+      recv_packet (server, buffer, header.nbytes);
+      log << "received " << header.nbytes << " bytes" << endl;
+      std::ofstream newFile(filename,std::ios::binary);
+      newFile.write(buffer,header.nbytes);
+      buffer[header.nbytes] = '\0';
+      delete[] buffer; 
+   }
+}
+
+//help command
 void cix_help() {
    cout << help;
 }
 
+//ls command
 void cix_ls (client_socket& server) {
    cix_header header;
    header.command = cix_command::LS;
@@ -79,20 +108,34 @@ int main (int argc, char** argv) {
          getline (cin, line);
          if (cin.eof()) throw cix_exit();
          log << "command " << line << endl;
-         const auto& itor = command_map.find (line);
+         //Tokenizes string (For filename inputs)
+         vector <string> tokens;
+         stringstream reader(line);
+         string token;
+         while(getline(reader, token, ' ')){
+            tokens.push_back(token);
+         } 
+         const auto& itor = command_map.find (tokens[0]);
          cix_command cmd = itor == command_map.end()
                          ? cix_command::ERROR : itor->second;
          switch (cmd) {
             case cix_command::EXIT:
+               if(tokens.size() != 1){goto defaultc;}
                throw cix_exit();
                break;
             case cix_command::HELP:
+               if(tokens.size() != 1){goto defaultc;}
                cix_help();
                break;
             case cix_command::LS:
+               if(tokens.size() != 1){goto defaultc;}
                cix_ls (server);
                break;
+            case cix_command::GET:
+               cix_get(server, tokens[1]);
+               break;  
             default:
+               defaultc:
                log << line << ": invalid command" << endl;
                break;
          }

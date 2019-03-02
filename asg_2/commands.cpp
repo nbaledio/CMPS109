@@ -44,6 +44,7 @@ int exit_status_message() {
 }
 
 void fn_noth(inode_state& state, const wordvec& words){
+int x;
 wordvec words2 = words;
 inode_ptr state2 = state.getroot();
 }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 using namespace std;
 
 #include <libgen.h>
@@ -47,6 +48,31 @@ void reply_ls (accepted_socket& client_sock, cix_header& header) {
    log << "sent " << ls_output.size() << " bytes" << endl;
 }
 
+//get reply function
+void reply_get(accepted_socket& client_sock, cix_header& header){
+  std::ifstream file(header.filename, std::ios::binary);
+  //If file is not found
+  if(file.is_open() == false){
+       log << "get: " << header.filename << ": " 
+       << strerror (errno) << endl;
+       header.command = cix_command::NAK;
+       send_packet (client_sock, &header, sizeof header);
+       header.nbytes = errno;
+       return;
+  }
+       file.seekg (0, file.end);
+       int length = file.tellg();
+       file.seekg(0, file.beg);
+       char * buffer = new char[length];
+       file.read(buffer, length);
+       header.command = cix_command::FILEOUT;
+       header.nbytes = length;
+       log << "sending header " << header << endl;
+       send_packet (client_sock, &header, sizeof header);
+       send_packet (client_sock, buffer, length);
+       log << "sent " << length << " bytes" << endl;    
+}
+
 
 void run_server (accepted_socket& client_sock) {
    log.execname (log.execname() + "-server");
@@ -59,6 +85,9 @@ void run_server (accepted_socket& client_sock) {
          switch (header.command) {
             case cix_command::LS: 
                reply_ls (client_sock, header);
+               break;
+            case cix_command::GET:
+               reply_get(client_sock, header);
                break;
             default:
                log << "invalid header from client:" << header << endl;
