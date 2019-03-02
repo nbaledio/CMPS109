@@ -25,6 +25,7 @@ unordered_map<string,cix_command> command_map {
    {"help", cix_command::HELP},
    {"ls"  , cix_command::LS  },
    {"get" , cix_command::GET },
+   {"put" , cix_command::PUT },
 };
 
 static const string help = R"||(
@@ -36,7 +37,33 @@ put filename - Copy local file to remote host.
 rm filename  - Remove file from remote server.
 )||";
 
-//get command : In Progress
+//put commnand
+void cix_put(client_socket& server,string filename){
+   cix_header header;
+   std::ifstream file(filename, std::ios::binary);
+   if(file.is_open() == false){
+       log << filename << ": No such file or directory" << endl;
+       return;
+   }
+   snprintf(header.filename,sizeof(header.filename),filename.c_str());
+   header.command = cix_command::PUT;
+   file.seekg (0, file.end);
+   int length = file.tellg();
+   file.seekg(0, file.beg);
+   char * buffer = new char[length];
+   file.read(buffer, length);
+   header.nbytes = length;
+   log << "sending header " << header << endl;
+   send_packet (server, &header, sizeof header);
+   send_packet (server, buffer, length);
+   log << "sent " << length << " bytes" << endl;
+   recv_packet (server, &header, sizeof header);
+   log << "received header " << header << endl;
+   delete buffer;
+
+}
+
+//get command
 void cix_get(client_socket& server, string filename){
    cix_header header;
    //strcpy(header.filename, filename.c_str()); <- Use snprintf
@@ -133,6 +160,9 @@ int main (int argc, char** argv) {
                break;
             case cix_command::GET:
                cix_get(server, tokens[1]);
+               break;
+            case cix_command::PUT:
+               cix_put(server,tokens[1]);
                break;  
             default:
                defaultc:
