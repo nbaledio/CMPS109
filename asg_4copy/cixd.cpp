@@ -48,6 +48,23 @@ void reply_ls (accepted_socket& client_sock, cix_header& header) {
    log << "sent " << ls_output.size() << " bytes" << endl;
 }
 
+//put reply function
+void reply_put(accepted_socket& client_sock, cix_header& header){
+   char* buffer = new char [header.nbytes];
+   std::ofstream newFile(header.filename,std::ios::binary);
+   recv_packet(client_sock, buffer, header.nbytes);
+   newFile.write(buffer, header.nbytes);
+   if(newFile.is_open() == false){
+       header.command = cix_command::NAK;
+       log << header.filename << ": Could not copy file" << endl;
+   }else{
+       header.command = cix_command::ACK;
+   }
+   log << "sending header " << header << endl;
+   send_packet (client_sock, &header, sizeof header);
+   delete buffer;
+}
+
 //get reply function
 void reply_get(accepted_socket& client_sock, cix_header& header){
   std::ifstream file(header.filename, std::ios::binary);
@@ -70,7 +87,8 @@ void reply_get(accepted_socket& client_sock, cix_header& header){
        log << "sending header " << header << endl;
        send_packet (client_sock, &header, sizeof header);
        send_packet (client_sock, buffer, length);
-       log << "sent " << length << " bytes" << endl;    
+       log << "sent " << length << " bytes" << endl;
+       delete buffer;    
 }
 
 
@@ -87,7 +105,10 @@ void run_server (accepted_socket& client_sock) {
                reply_ls (client_sock, header);
                break;
             case cix_command::GET:
-               reply_get(client_sock, header);
+               reply_get (client_sock, header);
+               break;
+            case cix_command::PUT:
+               reply_put (client_sock,header);
                break;
             default:
                log << "invalid header from client:" << header << endl;
