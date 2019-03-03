@@ -26,6 +26,7 @@ unordered_map<string,cix_command> command_map {
    {"ls"  , cix_command::LS  },
    {"get" , cix_command::GET },
    {"put" , cix_command::PUT },
+   {"rm"  , cix_command::RM  },
 };
 
 static const string help = R"||(
@@ -37,7 +38,21 @@ put filename - Copy local file to remote host.
 rm filename  - Remove file from remote server.
 )||";
 
-//put commnand
+//rm command
+void cix_rm(client_socket&server, string filename){
+   cix_header header;
+   snprintf(header.filename,sizeof(header.filename),filename.c_str());
+   header.command = cix_command::RM;
+   log << "sending header " << header << endl;
+   send_packet (server, &header, sizeof header);
+   recv_packet (server, &header, sizeof header);
+   log << "received header " << header << endl;
+   if(header.command != cix_command::ACK){
+      log << "Could not delete " << header.filename << endl;
+   }
+}
+
+//put commnand (basically cixd get)
 void cix_put(client_socket& server,string filename){
    cix_header header;
    std::ifstream file(filename, std::ios::binary);
@@ -163,6 +178,9 @@ int main (int argc, char** argv) {
                break;
             case cix_command::PUT:
                cix_put(server,tokens[1]);
+               break;
+            case cix_command::RM:
+               cix_rm(server,tokens[1]);
                break;  
             default:
                defaultc:

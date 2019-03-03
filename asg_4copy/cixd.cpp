@@ -48,7 +48,26 @@ void reply_ls (accepted_socket& client_sock, cix_header& header) {
    log << "sent " << ls_output.size() << " bytes" << endl;
 }
 
-//put reply function
+//rm reply function
+void reply_rm(accepted_socket& client_sock, cix_header& header){
+   std::ifstream file(header.filename, std::ios::binary);
+   if(file.is_open() == false){
+       log << header.filename << ": No such file or directory" << endl;
+       return;
+   }
+   int remove = unlink(header.filename);
+   if(remove !=0 ){
+       log << "Could not delete file" << endl;
+       header.command = cix_command::NAK;
+   }else{
+       log << "Deleted: " << header.filename << endl;
+       header.command =  cix_command::ACK;
+   }  
+   log << "sending header " << header << endl;
+   send_packet (client_sock, &header, sizeof header);
+}
+
+//put reply function (Basically cix get)
 void reply_put(accepted_socket& client_sock, cix_header& header){
    char* buffer = new char [header.nbytes];
    std::ofstream newFile(header.filename,std::ios::binary);
@@ -60,6 +79,7 @@ void reply_put(accepted_socket& client_sock, cix_header& header){
    }else{
        header.command = cix_command::ACK;
    }
+   header.nbytes = 0;
    log << "sending header " << header << endl;
    send_packet (client_sock, &header, sizeof header);
    delete buffer;
@@ -109,6 +129,9 @@ void run_server (accepted_socket& client_sock) {
                break;
             case cix_command::PUT:
                reply_put (client_sock,header);
+               break;
+            case cix_command::RM:
+               reply_rm(client_sock, header);
                break;
             default:
                log << "invalid header from client:" << header << endl;
