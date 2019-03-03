@@ -53,6 +53,9 @@ void reply_rm(accepted_socket& client_sock, cix_header& header){
    std::ifstream file(header.filename, std::ios::binary);
    if(file.is_open() == false){
        log << header.filename << ": No such file or directory" << endl;
+       header.command = cix_command::NAK;
+       log << "sending header " << header << endl;
+       send_packet (client_sock, &header, sizeof header);
        return;
    }
    int remove = unlink(header.filename);
