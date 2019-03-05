@@ -1,4 +1,6 @@
 // $Id: logstream.h,v 1.2 2019-02-21 18:19:49-08 - - $
+//Nathan Baledio
+//ID: 1574354
 
 //
 // class logstream

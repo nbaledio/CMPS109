@@ -1,4 +1,6 @@
 // $Id: cixd.cpp,v 1.7 2016-05-09 16:01:56-07 - - $
+//Nathan Baledio
+//ID: 1574354
 
 #include <iostream>
 #include <string>
@@ -21,7 +23,8 @@ void reply_ls (accepted_socket& client_sock, cix_header& header) {
    const char* ls_cmd = "ls -l 2>&1";
    FILE* ls_pipe = popen (ls_cmd, "r");
    if (ls_pipe == NULL) { 
-      log << "ls -l: popen failed: " << strerror (errno) << endl;
+      //"ls -l: popen failed: " << strerror (errno) << endl;
+      fprintf(stderr, "Server : ls -l: popen failed\n");
       header.command = cix_command::NAK;
       header.nbytes = errno;
       send_packet (client_sock, &header, sizeof header);
@@ -42,31 +45,38 @@ void reply_ls (accepted_socket& client_sock, cix_header& header) {
    header.command = cix_command::LSOUT;
    header.nbytes = ls_output.size();
    memset (header.filename, 0, FILENAME_SIZE);
-   log << "sending header " << header << endl;
+   //log << "sending header " << header << endl;
    send_packet (client_sock, &header, sizeof header);
    send_packet (client_sock, ls_output.c_str(), ls_output.size());
-   log << "sent " << ls_output.size() << " bytes" << endl;
+   //log << "sent " << ls_output.size() << " bytes" << endl;
 }
 
 //rm reply function
 void reply_rm(accepted_socket& client_sock, cix_header& header){
    std::ifstream file(header.filename, std::ios::binary);
    if(file.is_open() == false){
-       log << header.filename << ": No such file or directory" << endl;
+     //log << header.filename << ": No such file or directory" << endl;
+       fprintf(stderr, "Server: ");
+       fprintf(stderr, header.filename);
+       fprintf(stderr, ": No such file or directory\n");
        header.command = cix_command::NAK;
-       log << "sending header " << header << endl;
+       //log << "sending header " << header << endl;
        send_packet (client_sock, &header, sizeof header);
        return;
    }
+   //.score: Use unlink, not delete
    int remove = unlink(header.filename);
    if(remove !=0 ){
-       log << "Could not delete file" << endl;
+       //log << "Could not delete: " << header.filename << endl;
+       fprintf(stderr, "Server: Could not delete: ");
+       fprintf(stderr, header.filename);
+       fprintf(stderr, "\n");
        header.command = cix_command::NAK;
    }else{
-       log << "Deleted: " << header.filename << endl;
+       //log << "Deleted: " << header.filename << endl;
        header.command =  cix_command::ACK;
    }  
-   log << "sending header " << header << endl;
+   //log << "sending header " << header << endl;
    send_packet (client_sock, &header, sizeof header);
 }
 
@@ -78,12 +88,15 @@ void reply_put(accepted_socket& client_sock, cix_header& header){
    newFile.write(buffer, header.nbytes);
    if(newFile.is_open() == false){
        header.command = cix_command::NAK;
-       log << header.filename << ": Could not copy file" << endl;
+       //log << header.filename << ": Could not copy file" << endl;
+       fprintf(stderr, "Server: ");
+       fprintf(stderr, header.filename);
+       fprintf(stderr, ": Could not copy file\n");
    }else{
        header.command = cix_command::ACK;
    }
    header.nbytes = 0;
-   log << "sending header " << header << endl;
+   //log << "sending header " << header << endl;
    send_packet (client_sock, &header, sizeof header);
    delete buffer;
 }
@@ -93,8 +106,9 @@ void reply_get(accepted_socket& client_sock, cix_header& header){
   std::ifstream file(header.filename, std::ios::binary);
   //If file is not found
   if(file.is_open() == false){
-       log << "get: " << header.filename << ": " 
-       << strerror (errno) << endl;
+       fprintf(stderr, "Server: ");
+       fprintf(stderr, header.filename);
+       fprintf(stderr, ": No such file or directory\n");
        header.command = cix_command::NAK;
        send_packet (client_sock, &header, sizeof header);
        header.nbytes = errno;
@@ -107,10 +121,10 @@ void reply_get(accepted_socket& client_sock, cix_header& header){
        file.read(buffer, length);
        header.command = cix_command::FILEOUT;
        header.nbytes = length;
-       log << "sending header " << header << endl;
+       //log << "sending header " << header << endl;
        send_packet (client_sock, &header, sizeof header);
        send_packet (client_sock, buffer, length);
-       log << "sent " << length << " bytes" << endl;
+       //log << "sent " << length << " bytes" << endl;
        delete buffer;    
 }
 
@@ -122,7 +136,7 @@ void run_server (accepted_socket& client_sock) {
       for (;;) {
          cix_header header; 
          recv_packet (client_sock, &header, sizeof header);
-         log << "received header " << header << endl;
+         //log << "received header " << header << endl;
          switch (header.command) {
             case cix_command::LS: 
                reply_ls (client_sock, header);

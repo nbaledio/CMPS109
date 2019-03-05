@@ -1,4 +1,6 @@
 // $Id: cix.cpp,v 1.7 2019-02-07 15:14:37-08 - - $
+//Nathan Baledio
+//ID: 1574354
 
 #include <iostream>
 #include <memory>
