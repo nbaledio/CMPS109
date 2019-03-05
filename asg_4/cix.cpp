@@ -43,23 +43,26 @@ void cix_rm(client_socket&server, string filename){
    cix_header header;
    snprintf(header.filename,sizeof(header.filename),filename.c_str());
    header.command = cix_command::RM;
-   log << "sending header " << header << endl;
+   //log << "sending header " << header << endl;
    send_packet (server, &header, sizeof header);
    recv_packet (server, &header, sizeof header);
-   log << "received header " << header << endl;
+   //log << "received header " << header << endl;
    if(header.command != cix_command::ACK){
-      log << "Could not delete " << header.filename << endl;
+      log << "sent RM, server did not return ACK" << endl;
+      log << "server returned " << header << endl;
    }
 }
 
-//put commnand (basically cixd get)
+//put command (basically cixd get)
 void cix_put(client_socket& server,string filename){
    cix_header header;
    std::ifstream file(filename, std::ios::binary);
+   //Checks if file exists in local directory
    if(file.is_open() == false){
        log << filename << ": No such file or directory" << endl;
        return;
    }
+   //If it exists, prepares to send file
    snprintf(header.filename,sizeof(header.filename),filename.c_str());
    header.command = cix_command::PUT;
    file.seekg (0, file.end);
@@ -68,33 +71,43 @@ void cix_put(client_socket& server,string filename){
    char * buffer = new char[length];
    file.read(buffer, length);
    header.nbytes = length;
-   log << "sending header " << header << endl;
+   //log << "sending header " << header << endl;
    send_packet (server, &header, sizeof header);
    send_packet (server, buffer, length);
-   log << "sent " << length << " bytes" << endl;
+   //log << "sent " << length << " bytes" << endl;
+   
+   //Receives packet from server
    recv_packet (server, &header, sizeof header);
-   log << "received header " << header << endl;
+   if(header.command != cix_command::ACK){
+      log << "sent PUT, server did not return ACK" << endl;
+      log << "server returned " << header << endl;    
+   }else{
+   //log << "received header " << header << endl;
    delete buffer;
-
+    }
 }
 
 //get command
 void cix_get(client_socket& server, string filename){
+   //Prepares to send file
    cix_header header;
    //strcpy(header.filename, filename.c_str()); <- Use snprintf
    snprintf(header.filename,sizeof(header.filename),filename.c_str());
    header.command = cix_command::GET;
-   log << "sending header " << header << endl;
+   //log << "sending header " << header << endl;
    send_packet (server, &header, sizeof header);
    recv_packet (server, &header, sizeof header);
-   log << "received header " << header << endl;
+   //log << "received header " << header << endl;
+   
+   //Checks to see if a file was returned
    if(header.command != cix_command::FILEOUT){
        log << "sent GET, server did not return FILEOUT" << endl;
        log << "server returned " << header << endl;
    }else{
+      //Writes file to current directory
       char* buffer = new char[header.nbytes];
       recv_packet (server, buffer, header.nbytes);
-      log << "received " << header.nbytes << " bytes" << endl;
+      //log << "received " << header.nbytes << " bytes" << endl;
       std::ofstream newFile(filename,std::ios::binary);
       newFile.write(buffer,header.nbytes);
       buffer[header.nbytes] = '\0';
@@ -111,19 +124,19 @@ void cix_help() {
 void cix_ls (client_socket& server) {
    cix_header header;
    header.command = cix_command::LS;
-   log << "sending header " << header << endl;
+   //log << "sending header " << header << endl;
    send_packet (server, &header, sizeof header);
    recv_packet (server, &header, sizeof header);
-   log << "received header " << header << endl;
+   //log << "received header " << header << endl;
    if (header.command != cix_command::LSOUT) {
       log << "sent LS, server did not return LSOUT" << endl;
       log << "server returned " << header << endl;
    }else {
       auto buffer = make_unique<char[]> (header.nbytes + 1);
       recv_packet (server, buffer.get(), header.nbytes);
-      log << "received " << header.nbytes << " bytes" << endl;
+     // log << "received " << header.nbytes << " bytes" << endl;
       buffer[header.nbytes] = '\0';
-      cout << buffer.get();
+      //cout << buffer.get();
    }
 }
 
