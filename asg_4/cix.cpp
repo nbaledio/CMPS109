@@ -48,8 +48,8 @@ void cix_rm(client_socket&server, string filename){
    recv_packet (server, &header, sizeof header);
    //log << "received header " << header << endl;
    if(header.command != cix_command::ACK){
-      log << "sent RM, server did not return ACK" << endl;
-      log << "server returned " << header << endl;
+      fprintf(stderr, "Client: Sent RM, server did not return ACK\n");
+      fprintf(stderr, "Server returned NAK\n");
    }
 }
 
@@ -59,7 +59,9 @@ void cix_put(client_socket& server,string filename){
    std::ifstream file(filename, std::ios::binary);
    //Checks if file exists in local directory
    if(file.is_open() == false){
-       log << filename << ": No such file or directory" << endl;
+       fprintf(stderr, "Client: ");
+       fprintf(stderr, filename.c_str());
+       fprintf(stderr,  ": No such file or directory\n");
        return;
    }
    //If it exists, prepares to send file
@@ -79,8 +81,8 @@ void cix_put(client_socket& server,string filename){
    //Receives packet from server
    recv_packet (server, &header, sizeof header);
    if(header.command != cix_command::ACK){
-      log << "sent PUT, server did not return ACK" << endl;
-      log << "server returned " << header << endl;    
+      fprintf(stderr, "Client: Sent PUT, server did not return ACK\n");
+      fprintf(stderr, "Server returned NAK\n");   
    }else{
    //log << "received header " << header << endl;
    delete buffer;
@@ -101,8 +103,9 @@ void cix_get(client_socket& server, string filename){
    
    //Checks to see if a file was returned
    if(header.command != cix_command::FILEOUT){
-       log << "sent GET, server did not return FILEOUT" << endl;
-       log << "server returned " << header << endl;
+       fprintf(stderr,
+       "Client: Sent GET, server did not return FILEOUT\n");
+       fprintf(stderr, "Server returned NAK\n");
    }else{
       //Writes file to current directory
       char* buffer = new char[header.nbytes];
@@ -129,12 +132,13 @@ void cix_ls (client_socket& server) {
    recv_packet (server, &header, sizeof header);
    //log << "received header " << header << endl;
    if (header.command != cix_command::LSOUT) {
-      log << "sent LS, server did not return LSOUT" << endl;
-      log << "server returned " << header << endl;
+      fprintf(stderr, 
+      "Client: Sent LS, server did not return LSOUT\n");
+      fprintf(stderr, "Server returned NAK\n");
    }else {
       auto buffer = make_unique<char[]> (header.nbytes + 1);
       recv_packet (server, buffer.get(), header.nbytes);
-     // log << "received " << header.nbytes << " bytes" << endl;
+      //log << "received " << header.nbytes << " bytes" << endl;
       buffer[header.nbytes] = '\0';
       //cout << buffer.get();
    }
