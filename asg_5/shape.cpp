@@ -2,6 +2,7 @@
 
 #include <typeinfo>
 #include <unordered_map>
+#include <cmath>
 using namespace std;
 
 #include "shape.h"
@@ -56,7 +57,8 @@ polygon::polygon (const vertex_list& vertices_): vertices(vertices_) {
 }
 
 rectangle::rectangle (GLfloat width, GLfloat height):
-            polygon({}) {
+polygon({{-width/2,-height/2},{-width/2,height/2},{width/2,height/2},
+{width/2,-height/2}}) {
    DEBUGF ('c', this << "(" << width << "," << height << ")");
 }
 
@@ -64,16 +66,49 @@ square::square (GLfloat width): rectangle (width, width) {
    DEBUGF ('c', this);
 }
 
+diamond::diamond (const GLfloat width, const GLfloat height):polygon
+({{-width/2,0},{0,height/2},{width/2,0},{0,-height/2}}){
+   DEBUGF ('c', this);
+}
+
+triangle::triangle(const vertex_list& vertices_):polygon(vertices_){
+   DEBUGF ('c', this);
+}
+
+equilateral::equilateral(const GLfloat width):triangle({{0,0},
+{width/2,.866f*width},{0,width}}){
+   DEBUGF ('c', this);
+}
+
 void text::draw (const vertex& center, const rgbcolor& color) const {
    DEBUGF ('d', this << "(" << center << "," << color << ")");
+   glColor3ubv(color.ubvec); //Set text color
+   glRasterPos2f(center.xpos,center.ypos); //Set position
+   glutBitmapString (glut_bitmap_font, //Set Font/text
+   reinterpret_cast<const unsigned char*>(textdata.c_str()));
 }
 
 void ellipse::draw (const vertex& center, const rgbcolor& color) const {
    DEBUGF ('d', this << "(" << center << "," << color << ")");
+   glBegin(GL_POLYGON);
+   glEnable(GL_LINE_SMOOTH);
+   glColor3ubv(color.ubvec);
+   glEnd();
 }
 
 void polygon::draw (const vertex& center, const rgbcolor& color) const {
    DEBUGF ('d', this << "(" << center << "," << color << ")");
+}
+
+void text::drawborder (const vertex&, const rgbcolor&) const {
+   
+}
+
+void ellipse::drawborder(const vertex&, const rgbcolor&) const {
+  
+} 
+void polygon::drawborder(const vertex&, const rgbcolor&) const {
+   
 }
 
 void shape::show (ostream& out) const {
