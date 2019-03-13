@@ -1,2 +1,22 @@
-tokenize : https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
-istream reade : http://www.cplusplus.com/reference/istream/istream/read/
+Nathan Baledio
+ID: 1574354
+CruzID: nbaledio
+----------------
+
+Files included:
+1. cix.cpp
+2. cid.cpp
+3. logstream.h
+4. Makefile
+5. protocol.cpp
+6. protocol.h
+7. README
+8. sockets.cpp
+9. sockets.h
+
+Notes:
+- I did not do pair programming for this assignment
+- Tokenize code used from https://www.geeksforgeeks.org/tokenizing-a-string-cpp/
+- istream reader code used from http://www.cplusplus.com/reference/istream/istream/read/
+- Error messages are printed to stderr, not log. Server (cixd) will still have some log
+messages (not sure if server was also supposed to only print error messages)

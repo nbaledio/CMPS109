@@ -142,7 +142,7 @@ void cix_ls (client_socket& server) {
       recv_packet (server, buffer.get(), header.nbytes);
       //log << "received " << header.nbytes << " bytes" << endl;
       buffer[header.nbytes] = '\0';
-      //cout << buffer.get();
+      cout << buffer.get();
    }
 }
 
@@ -154,7 +154,7 @@ void usage() {
 
 int main (int argc, char** argv) {
    log.execname (basename (argv[0]));
-   log << "starting" << endl;
+   //log << "starting" << endl;
    vector<string> args (&argv[1], &argv[argc]);
    if (args.size() > 2) usage();
    string host = get_cix_server_host (args, 0);
@@ -168,7 +168,7 @@ int main (int argc, char** argv) {
          string line;
          getline (cin, line);
          if (cin.eof()) throw cix_exit();
-         log << "command " << line << endl;
+         //log << "command " << line << endl;
          //Tokenizes string (For filename inputs)
          vector <string> tokens;
          stringstream reader(line);
