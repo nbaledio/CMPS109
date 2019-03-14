@@ -13,8 +13,9 @@ int window::height = 480; // in pixels
 vector<object> window::objects;
 size_t window::selected_obj = 0;
 mouse window::mus;
-//GLfloat window::thickness = 4.0;
-//rgbcolor window::bordercolor = rgbcolor{255,0,0};
+GLfloat window::thickness = 4.0;
+rgbcolor window::bordercolor = rgbcolor{255,0,0};
+int window::pixels = 4;
 
 // Executed when window system signals to shut down.
 void window::close() {
@@ -74,24 +75,42 @@ void window::keyboard (GLubyte key, int x, int y) {
          window::close();
          break;
       case 'H': case 'h':
+         objects[selected_obj].move(-pixels,0);
          //move_selected_object (
          break;
       case 'J': case 'j':
+         objects[selected_obj].move(0,-pixels);
          //move_selected_object (
          break;
       case 'K': case 'k':
+         objects[selected_obj].move(0,pixels);
          //move_selected_object (
          break;
       case 'L': case 'l':
+         objects[selected_obj].move(pixels,0);
          //move_selected_object (
          break;
       case 'N': case 'n': case SPACE: case TAB:
+         selected_obj+=1;
+         //Reset to first obj if oob
+         if(selected_obj == objects.size()){
+            selected_obj = 0;
+         }
          break;
       case 'P': case 'p': case BS:
+         selected_obj-=1;
+         //Reset to last obj if oob
+         if(selected_obj > objects.size()){
+           selected_obj = objects.size() - 1;
+         }
          break;
       case '0': case '1': case '2': case '3': case '4':
       case '5': case '6': case '7': case '8': case '9':
-         //select_object (key - '0');
+         if(unsigned(key - '0') >= objects.size()){
+            cerr << "Invalid index" << endl;
+            break;
+         }
+         selected_obj = (key - '0');
          break;
       default:
          cerr << unsigned (key) << ": invalid keystroke" << endl;

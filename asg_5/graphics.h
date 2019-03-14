@@ -74,6 +74,7 @@ class window {
       static void passivemotion (int x, int y);
       static void mousefn (int button, int state, int x, int y);
    public:
+      static int pixels;
       static rgbcolor bordercolor;
       static GLfloat thickness;
       static void set_new_center(string obj_name, vertex v);
