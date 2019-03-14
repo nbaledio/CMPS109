@@ -63,7 +63,6 @@ void window::reshape (int width, int height) {
    glutPostRedisplay();
 }
 
-//ADD HERE
 
 // Executed when a regular keyboard key is pressed.
 void window::keyboard (GLubyte key, int x, int y) {
@@ -119,29 +118,34 @@ void window::keyboard (GLubyte key, int x, int y) {
    glutPostRedisplay();
 }
 
-//ADD HERE
 
 // Executed when a special function key is pressed.
 void window::special (int key, int x, int y) {
    DEBUGF ('g', "key=" << key << ", x=" << x << ", y=" << y);
    window::mus.set (x, y);
    switch (key) {
-      case GLUT_KEY_LEFT: //move_selected_object (-1, 0); break;
-      case GLUT_KEY_DOWN: //move_selected_object (0, -1); break;
-      case GLUT_KEY_UP: //move_selected_object (0, +1); break;
-      case GLUT_KEY_RIGHT: //move_selected_object (+1, 0); break;
-      case GLUT_KEY_F1: //select_object (1); break;
-      case GLUT_KEY_F2: //select_object (2); break;
-      case GLUT_KEY_F3: //select_object (3); break;
-      case GLUT_KEY_F4: //select_object (4); break;
-      case GLUT_KEY_F5: //select_object (5); break;
-      case GLUT_KEY_F6: //select_object (6); break;
-      case GLUT_KEY_F7: //select_object (7); break;
-      case GLUT_KEY_F8: //select_object (8); break;
-      case GLUT_KEY_F9: //select_object (9); break;
-      case GLUT_KEY_F10: //select_object (10); break;
-      case GLUT_KEY_F11: //select_object (11); break;
-      case GLUT_KEY_F12: //select_object (12); break;
+      case GLUT_KEY_LEFT: objects[selected_obj].move(-pixels,0); break;
+      case GLUT_KEY_DOWN: objects[selected_obj].move(0,-pixels); break;
+      case GLUT_KEY_UP: objects[selected_obj].move(0,pixels); break;
+      case GLUT_KEY_RIGHT: objects[selected_obj].move(pixels,0); break;
+      case GLUT_KEY_F1:
+      case GLUT_KEY_F2: 
+      case GLUT_KEY_F3:
+      case GLUT_KEY_F4: 
+      case GLUT_KEY_F5:
+      case GLUT_KEY_F6:
+      case GLUT_KEY_F7: 
+      case GLUT_KEY_F8:
+      case GLUT_KEY_F9:
+      case GLUT_KEY_F10:
+      case GLUT_KEY_F11:
+      case GLUT_KEY_F12:
+         if(unsigned(key-1) >= objects.size()){
+               cerr << "Invalid index" << endl;
+               break;
+         }
+         selected_obj = (key-1);
+         break;
       default:
          cerr << unsigned (key) << ": invalid function key" << endl;
          break;
