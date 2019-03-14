@@ -32,6 +32,9 @@ ostream& operator<< (ostream& out, const vertex& where) {
    out << "(" << where.xpos << "," << where.ypos << ")";
    return out;
 }
+//ALL SHAPES CREATED AT ORIGIN (0,0) THEY ARE RE-CENTERED
+//ONCE THEIR DRAW FUNCTION IS CALLED (which simply
+//adds to each vertice)
 
 shape::shape() {
    DEBUGF ('c', this);
@@ -57,8 +60,8 @@ polygon::polygon (const vertex_list& vertices_): vertices(vertices_) {
 }
 
 rectangle::rectangle (GLfloat width, GLfloat height):
-polygon({{-width/2,-height/2},{-width/2,height/2},{width/2,height/2},
-{width/2,-height/2}}) {
+polygon({{-width,-height},{-width,height},{width,height},
+{width,-height}}) {
    DEBUGF ('c', this << "(" << width << "," << height << ")");
 }
 
@@ -75,8 +78,10 @@ triangle::triangle(const vertex_list& vertices_):polygon(vertices_){
    DEBUGF ('c', this);
 }
 
-equilateral::equilateral(const GLfloat width):triangle({{0,0},
-{width/2,.866f*width},{0,width}}){
+//Rough estimates to create an equilateral
+equilateral::equilateral(const GLfloat width):triangle({
+{-width/2,.865f*.333f*-width},{0,.865f*.666f*width},
+{width/2,.865f*.333f*-width}}){
    DEBUGF ('c', this);
 }
 
@@ -90,23 +95,55 @@ void text::draw (const vertex& center, const rgbcolor& color) const {
 
 void ellipse::draw (const vertex& center, const rgbcolor& color) const {
    DEBUGF ('d', this << "(" << center << "," << color << ")");
-   glBegin(GL_POLYGON);
+// CODE DOESN"T WORK. USE ELLIPSE CODE IN EXAMPLES
+//   glBegin(GL_POLYGON);
+//   glEnable(GL_LINE_SMOOTH);
+//   glColor3ubv(color.ubvec);
+//   int conversion = M_PI/180;
+//   for(int i = 0; i < 360; i++){
+//      float rad = i*conversion;
+//      glVertex2f(cos(rad)*center.xpos,sin(rad)*center.ypos);
+//   }
+//   glEnd();
+
+   //PROVIDED FROM EXAMPLES
+   glBegin (GL_POLYGON);
    glEnable(GL_LINE_SMOOTH);
-   glColor3ubv(color.ubvec);
+   glColor3ubv (color.ubvec);
+   const float delta = 2 * M_PI / 32;
+//   float width = window.width / 3 * scale;
+//   float height = window.width / 3 * scale;
+   for (float theta = 0; theta < 2 * M_PI; theta += delta) {
+      //Re-locate to new center
+      float xpos = dimension.xpos * cos (theta) + center.xpos;
+      float ypos = dimension.ypos * sin (theta) + center.ypos;
+      glVertex2f (xpos, ypos);
+   }
    glEnd();
 }
 
 void polygon::draw (const vertex& center, const rgbcolor& color) const {
    DEBUGF ('d', this << "(" << center << "," << color << ")");
+   glBegin(GL_POLYGON);
+   glColor3ubv(color.ubvec);
+   for(unsigned int i = 0; i < vertices.size(); i++){
+        //Re-locate to new center
+        glVertex2f(vertices[i].xpos+center.xpos,
+        vertices[i].ypos+center.ypos);
+   }
+   glEnd();
 }
 
-void text::drawborder (const vertex&, const rgbcolor&) const {
-   
+//Borders redraw shape, but behind and bigger (based on input)
+
+void text::drawborder(const vertex&, const rgbcolor&) const {
+
 }
 
 void ellipse::drawborder(const vertex&, const rgbcolor&) const {
-  
-} 
+   
+}
+ 
 void polygon::drawborder(const vertex&, const rgbcolor&) const {
    
 }

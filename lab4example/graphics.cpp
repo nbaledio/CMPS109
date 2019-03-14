@@ -40,23 +40,13 @@ void window::entry (int mouse_entered) {
 
 // Called to display the objects in the window.
 void window::display() {
-   glClear (GL_COLOR_BUFFER_BIT);
-   int i = 0;
-   string number;
-   vertex bounds_vertex;
-   //NEEDS TO BE HERE FOR TEXT OBJECT BORDER TO RENDER
-   objects[selected_obj].draw();
-   //Sets the border around current selected object
-   objects[selected_obj].draw_border();
+   glClear (GL_COLOR_BUFFER_BIT); 
+   cout << "test" << endl;
    //cout << "Drawing selected object's border " << endl;
    for (auto& object: window::objects) {
-      bounds_vertex = object.get_center();
       object.draw();
-      number = std::to_string(i);
-      object.set_object_number(number);
-      object.draw_object_number();
-      ++i;
-   }
+   } 
+   mus.draw();
    glutSwapBuffers();
 }
 
@@ -411,7 +401,7 @@ void window::set_new_center(string obj_name, vertex v) {
 }
 
 void window::set_color(string obj_name, const rgbcolor& color) {
-
+cout << "color" << endl;
    for (unsigned int num = 0; num < objects.size(); num++) {
       
    if (objects[num].get_name() == obj_name)

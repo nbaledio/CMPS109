@@ -12,7 +12,6 @@ using namespace std;
 #include "rgbcolor.h"
 
 #include "colors.cppgen"
-
 rgbcolor::rgbcolor (const string& name) {
    auto entry = color_names.find (name);
    if (entry != color_names.end()) {

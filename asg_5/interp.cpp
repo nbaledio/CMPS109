@@ -26,6 +26,9 @@ interpreter::factory_map {
    {"polygon"  , &interpreter::make_polygon  },
    {"rectangle", &interpreter::make_rectangle},
    {"square"   , &interpreter::make_square   },
+   {"diamond"  , &interpreter::make_diamond  },
+   {"triangle" , &interpreter::make_triangle },
+   {"equilateral",&interpreter::make_equilateral},
 };
 
 interpreter::shape_map interpreter::objmap;
@@ -50,10 +53,9 @@ void interpreter::interpret (const parameters& params) {
 void interpreter::do_define (param begin, param end) {
    DEBUGF ('f', range (begin, end));
    string name = *begin;
-   objmap.emplace (name, make_shape (++begin, end));
+   objmap.emplace(name, make_shape(++begin, end));
 }
 
-
 void interpreter::do_draw (param begin, param end) {
    DEBUGF ('f', range (begin, end));
    if (end - begin != 4) throw runtime_error ("syntax error");
@@ -65,7 +67,9 @@ void interpreter::do_draw (param begin, param end) {
    rgbcolor color {begin[0]};
    vertex where {from_string<GLfloat> (begin[2]),
                  from_string<GLfloat> (begin[3])};
-   itor->second->draw (where, color);
+   //Push object to vector so draw can iterate though them
+   window::push_back(object(itor->second, where, color));
+   //itor->second->draw (where, color);
 }
 
 shape_ptr interpreter::make_shape (param begin, param end) {
@@ -81,31 +85,80 @@ shape_ptr interpreter::make_shape (param begin, param end) {
 
 shape_ptr interpreter::make_text (param begin, param end) {
    DEBUGF ('f', range (begin, end));
-   return make_shared<text> (nullptr, string());
+   string str = "";
+   string font = begin[0];
+   begin++;
+   while(begin != end){
+      str += *begin;
+      str += " ";
+      begin++;
+   }
+   return make_shared<text> (&font, str);
 }
 
 shape_ptr interpreter::make_ellipse (param begin, param end) {
    DEBUGF ('f', range (begin, end));
-   return make_shared<ellipse> (GLfloat(), GLfloat());
+   //width/height convert to float for GLfloat
+   return make_shared<ellipse>
+   (GLfloat(std::stof(begin[0])), GLfloat(std::stof(begin[1])));
 }
 
 shape_ptr interpreter::make_circle (param begin, param end) {
    DEBUGF ('f', range (begin, end));
-   return make_shared<circle> (GLfloat());
+   //diameter
+   return make_shared<circle> (GLfloat(std::stof(begin[0])));
 }
 
 shape_ptr interpreter::make_polygon (param begin, param end) {
    DEBUGF ('f', range (begin, end));
-   return make_shared<polygon> (vertex_list());
+   //Iterate and distinguish x coord and y coord
+   //Pair them and push to list
+   vertex_list coords;
+   while(begin != end){
+        GLfloat width = std::stof(begin[0]);
+        GLfloat height = std::stof(begin[1]);
+        coords.push_back({width, height});
+        begin+=2;
+   }
+   //list of coords
+   return make_shared<polygon> (coords);
 }
 
 shape_ptr interpreter::make_rectangle (param begin, param end) {
    DEBUGF ('f', range (begin, end));
-   return make_shared<rectangle> (GLfloat(), GLfloat());
+   //width/height
+   return make_shared<rectangle> (GLfloat(std::stof(begin[0])),
+   GLfloat(std::stof(begin[1])));
 }
 
 shape_ptr interpreter::make_square (param begin, param end) {
    DEBUGF ('f', range (begin, end));
-   return make_shared<square> (GLfloat());
+   //width
+   return make_shared<square> (GLfloat(std::stof(begin[0])));
 }
 
+shape_ptr interpreter::make_diamond (param begin, param end) {
+   DEBUGF ('f', range (begin, end));
+   //width/height
+   return make_shared<diamond> (GLfloat(std::stof(begin[0])),
+   GLfloat(std::stof(begin[1])));
+}
+
+shape_ptr interpreter::make_triangle (param begin, param end) {
+   DEBUGF ('f', range (begin, end));
+   vertex_list coords;
+   while(begin != end){
+        GLfloat width = std::stof(begin[0]);
+        GLfloat height = std::stof(begin[1]);
+        coords.push_back({width, height});
+        begin+=2;
+   }
+   //list of coords
+   return make_shared<triangle> (coords);
+}
+
+shape_ptr interpreter::make_equilateral (param begin, param end) {
+   DEBUGF ('f', range (begin, end));
+   //width
+   return make_shared<equilateral> (GLfloat(std::stof(begin[0])));
+}

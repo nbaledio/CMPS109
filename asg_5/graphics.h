@@ -15,11 +15,24 @@ using namespace std;
 class object {
    private:
       shared_ptr<shape> pshape;
-      vertex center;
-      rgbcolor color;
+      //Making them public to make it quicker
+      //to work with vs making setters/getters
+      //rgbcolor color;
+      //string name;
    public:
+      rgbcolor color;
+      string name;
+      vertex center;
+      //Constructor for new objects in display
+      object (const shared_ptr<shape>& shape, 
+      vertex& cent, rgbcolor colour){
+         pshape = shape; 
+         center = cent;
+         color = colour;
+      }
       // Default copiers, movers, dtor all OK.
       void draw() { pshape->draw (center, color); }
+      //void draw_border(){pshape->drawborder(center, color);}
       void move (GLfloat delta_x, GLfloat delta_y) {
          center.xpos += delta_x;
          center.ypos += delta_y;
@@ -61,6 +74,10 @@ class window {
       static void passivemotion (int x, int y);
       static void mousefn (int button, int state, int x, int y);
    public:
+      static rgbcolor bordercolor;
+      static GLfloat thickness;
+      static void set_new_center(string obj_name, vertex v);
+      static void set_color(string obj_name, const rgbcolor& color);
       static void push_back (const object& obj) {
                   objects.push_back (obj); }
       static void setwidth (int width_) { width = width_; }

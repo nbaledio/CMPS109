@@ -13,6 +13,8 @@ int window::height = 480; // in pixels
 vector<object> window::objects;
 size_t window::selected_obj = 0;
 mouse window::mus;
+//GLfloat window::thickness = 4.0;
+//rgbcolor window::bordercolor = rgbcolor{255,0,0};
 
 // Executed when window system signals to shut down.
 void window::close() {
@@ -32,10 +34,16 @@ void window::entry (int mouse_entered) {
    glutPostRedisplay();
 }
 
+//ADD HERE 
 // Called to display the objects in the window.
 void window::display() {
    glClear (GL_COLOR_BUFFER_BIT);
-   for (auto& object: window::objects) object.draw();
+// objects[selected_obj].draw_border(thickness, bordercolor);
+   for(auto& object: window::objects){
+      //Check if shape needs to be reset after moving
+      object.draw();
+      //object.draw_border(thickness, bordercolor);
+   }
    mus.draw();
    glutSwapBuffers();
 }
@@ -54,6 +62,7 @@ void window::reshape (int width, int height) {
    glutPostRedisplay();
 }
 
+//ADD HERE
 
 // Executed when a regular keyboard key is pressed.
 void window::keyboard (GLubyte key, int x, int y) {
@@ -91,6 +100,7 @@ void window::keyboard (GLubyte key, int x, int y) {
    glutPostRedisplay();
 }
 
+//ADD HERE
 
 // Executed when a special function key is pressed.
 void window::special (int key, int x, int y) {

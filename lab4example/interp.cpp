@@ -74,10 +74,11 @@ void interpreter::do_define (param begin,param end) {
    objmap.emplace(name, pointer);
    object new_object(name, pointer);
    window::push_back(new_object);
+cout << "dodef" << endl;
 }
 
 void interpreter::do_draw (param begin, param end) {
-
+cout << "dodraw" << endl;
    if (end - begin != 4) throw runtime_error ("syntax error");
    string name = begin[1];
    shape_map::const_iterator itor = objmap.find (name);

@@ -176,10 +176,9 @@ void ellipse::draw_border(const vertex& center, const rgbcolor& color) {
 }
 
 void polygon::draw(const vertex& center, const rgbcolor& color) {
-
    auto ptr = color.ubvec3();
    vertex_list vertices_ = vertices;
-
+//cout << color.ubvec3() << endl;
    GLfloat x;
    GLfloat y;
    GLfloat x_average = 0.0;
@@ -199,6 +198,10 @@ void polygon::draw(const vertex& center, const rgbcolor& color) {
    for (unsigned int num = 0; num < vertices.size(); num++) {
       x = (vertices_[num].xpos - x_average) + center.xpos;
       y = (vertices_[num].ypos - y_average) + center.ypos;
+
+cout << x << endl;
+cout << y << endl;
+
       glVertex2f(x, y);
    }
    glEnd();
@@ -229,6 +232,8 @@ void polygon::draw_border(const vertex& center, const rgbcolor& color) {
    for (unsigned int num = 0; num < vertices.size(); num++) {
       x = (vertices_[num].xpos - x_average) + center.xpos;
       y = (vertices_[num].ypos - y_average) + center.ypos;
+cout << x << endl;
+cout << y << endl;
       glVertex2f(x, y);
    }
    glEnd();
