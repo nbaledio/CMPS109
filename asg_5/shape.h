@@ -43,7 +43,7 @@ using shape_ptr = shared_ptr<shape>;
 class shape {
    friend ostream& operator<< (ostream& out, const shape&);
    protected:
-      inline shape(); // Only subclass may instantiate.
+     inline shape(); // Only subclass may instantiate.
    public:
       shape (const shape&) = delete; // Prevent copying.
       shape& operator= (const shape&) = delete; // Prevent copying.
@@ -51,7 +51,9 @@ class shape {
       shape& operator= (shape&&) = delete; // Prevent moving.
       virtual ~shape() {}
       virtual void draw (const vertex&, const rgbcolor&) const = 0;
-      virtual void drawborder(const vertex&, const rgbcolor&) const = 0;
+      virtual void drawborder(const vertex&, const rgbcolor&,
+      const GLfloat&) const = 0;
+      virtual void drawnumber(const vertex&, const string&) const = 0;
       virtual void show (ostream&) const;
 };
 
@@ -75,7 +77,10 @@ class text: public shape {
       text (void* glut_bitmap_font, const string& textdata);
       virtual void draw (const vertex&, const rgbcolor&) const override;
       virtual void show (ostream&) const override;
-      virtual void drawborder(const vertex&, const rgbcolor&) const override;
+      virtual void drawborder(const vertex&, const rgbcolor&, 
+      const GLfloat&) const override;
+      virtual void drawnumber(const vertex&, const string&)
+      const override;
 };
 
 //
@@ -89,7 +94,10 @@ class ellipse: public shape {
       ellipse (GLfloat width, GLfloat height);
       virtual void draw (const vertex&, const rgbcolor&) const override;
       virtual void show (ostream&) const override;
-      virtual void drawborder(const vertex&, const rgbcolor&) const override;
+      virtual void drawborder(const vertex&, const rgbcolor&, 
+      const GLfloat&) const override;
+      virtual void drawnumber(const vertex&, const string&)
+      const override;
 };
 
 class circle: public ellipse {
@@ -108,7 +116,10 @@ class polygon: public shape {
       polygon (const vertex_list& vertices);
       virtual void draw (const vertex&, const rgbcolor&) const override;
       virtual void show (ostream&) const override;
-      virtual void drawborder(const vertex&, const rgbcolor&) const override;
+      virtual void drawborder(const vertex&, const rgbcolor&,
+      const GLfloat&) const override;
+      virtual void drawnumber(const vertex&, const string&)
+      const override;
 };
 
 

@@ -14,7 +14,7 @@ using namespace std;
 
 class object {
    private:
-      shared_ptr<shape> pshape;
+      shared_ptr<shape> pshape; //shape
       //Making them public to make it quicker
       //to work with vs making setters/getters
       //rgbcolor color;
@@ -32,11 +32,17 @@ class object {
       }
       // Default copiers, movers, dtor all OK.
       void draw() { pshape->draw (center, color); }
-      //void draw_border(){pshape->drawborder(center, color);}
       void move (GLfloat delta_x, GLfloat delta_y) {
          center.xpos += delta_x;
          center.ypos += delta_y;
       }
+      void drawborder(rgbcolor col, GLfloat thickness){
+         pshape->drawborder(center, col, thickness);
+      }
+      void drawnumber(string number){pshape->drawnumber(center, 
+      number);}
+      //Methods to print object number. Setter and printer
+      //Uses a text object and shape's print method
 };
 
 class mouse {
@@ -74,7 +80,7 @@ class window {
       static void passivemotion (int x, int y);
       static void mousefn (int button, int state, int x, int y);
    public:
-      static int pixels;
+      static GLfloat pixels;
       static rgbcolor bordercolor;
       static GLfloat thickness;
       static void set_new_center(string obj_name, vertex v);

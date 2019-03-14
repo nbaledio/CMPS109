@@ -1,6 +1,7 @@
 // $Id: graphics.cpp,v 1.4 2019-02-28 15:24:20-08 - - $
 
 #include <iostream>
+#include <string>
 using namespace std;
 
 #include <GL/freeglut.h>
@@ -15,7 +16,7 @@ size_t window::selected_obj = 0;
 mouse window::mus;
 GLfloat window::thickness = 4.0;
 rgbcolor window::bordercolor = rgbcolor{255,0,0};
-int window::pixels = 4;
+GLfloat window::pixels = 4.0;
 
 // Executed when window system signals to shut down.
 void window::close() {
@@ -35,16 +36,35 @@ void window::entry (int mouse_entered) {
    glutPostRedisplay();
 }
 
+
 //ADD HERE 
 // Called to display the objects in the window.
 void window::display() {
    glClear (GL_COLOR_BUFFER_BIT);
-// objects[selected_obj].draw_border(thickness, bordercolor);
+   int x = 0;
    for(auto& object: window::objects){
-      //Check if shape needs to be reset after moving
       object.draw();
-      //object.draw_border(thickness, bordercolor);
+      std::string numb = std::to_string(x);
+      object.drawnumber(numb);
+      //object.drawborder(window::bordercolor, window::thickness);
+      //Check for oob resetting
+      if(object.center.ypos > window::height){
+         object.center.ypos = 0;
+      }
+      if(object.center.ypos < 0){
+         object.center.ypos = window::height;
+      }
+      if(object.center.xpos > window::width){
+         object.center.xpos = 0;
+      }
+      if(object.center.xpos < 0){
+         object.center.xpos = window::width;
+      }
+      x++;
    }
+   //Draws border of selected objetct
+   objects[selected_obj].drawborder(window::bordercolor,
+   window::thickness);
    mus.draw();
    glutSwapBuffers();
 }

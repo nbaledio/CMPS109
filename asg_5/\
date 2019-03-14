@@ -88,8 +88,9 @@ equilateral::equilateral(const GLfloat width):triangle({
 void text::draw (const vertex& center, const rgbcolor& color) const {
    DEBUGF ('d', this << "(" << center << "," << color << ")");
    glColor3ubv(color.ubvec); //Set text color
-   glRasterPos2f(center.xpos,center.ypos); //Set position   
-   glutBitmapString (glut_bitmap_font, //Set Font/text
+   glRasterPos2f(center.xpos,center.ypos); //Set position
+   
+   glutBitmapString (GLUT_BITMAP_8_BY_13, //Set Font/text
    reinterpret_cast<const unsigned char*>(textdata.c_str()));
 }
 

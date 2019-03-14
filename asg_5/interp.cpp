@@ -31,6 +31,16 @@ interpreter::factory_map {
    {"equilateral",&interpreter::make_equilateral},
 };
 
+static unordered_map<string,void*> fontcode {
+   {"Fixed-8x13"    , GLUT_BITMAP_8_BY_13       },
+   {"Fixed-9x15"    , GLUT_BITMAP_9_BY_15       },
+   {"Helvetica-10"  , GLUT_BITMAP_HELVETICA_10  },
+   {"Helvetica-12"  , GLUT_BITMAP_HELVETICA_12  },
+   {"Helvetica-18"  , GLUT_BITMAP_HELVETICA_18  },
+   {"Times-Roman-10", GLUT_BITMAP_TIMES_ROMAN_10},
+   {"Times-Roman-24", GLUT_BITMAP_TIMES_ROMAN_24},
+};
+
 interpreter::shape_map interpreter::objmap;
 
 interpreter::~interpreter() {
@@ -86,14 +96,21 @@ shape_ptr interpreter::make_shape (param begin, param end) {
 shape_ptr interpreter::make_text (param begin, param end) {
    DEBUGF ('f', range (begin, end));
    string str = "";
-   string font = begin[0];
+   //Gets fonts
+   string font = *begin;
+   //Searches table for value
+   auto iterator = fontcode.find(font);
    begin++;
+   //Concatenates word and then adds a space after
    while(begin != end){
       str += *begin;
-      str += " ";
+      param next = begin + 1;
+      if(next != end){
+         str += " ";
+      }
       begin++;
    }
-   return make_shared<text> (&font, str);
+   return make_shared<text> (iterator->second, str);
 }
 
 shape_ptr interpreter::make_ellipse (param begin, param end) {
