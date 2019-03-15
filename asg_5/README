@@ -1,0 +1,32 @@
+Nathan Baledio
+ID: 1574354
+CruzID: nbaledio
+----------------
+
+Files included:
+1. colors.cppgen
+2. degub.cpp
+3. debug.h
+4. graphics.cpp
+5. graphics.h
+6. interp.cpp
+7. interp.h
+8. main.cpp
+9. Makefile
+10. Makefile.dep (Not sure if it's needed, but I get an error on Make if it does not already exist)
+11. README
+12. rgbcolor.cpp
+13. rgbcolor.h
+14. shape.cpp
+15. shape.h
+16. util.cpp
+17. util.h
+18. util.tcc
+
+Notes:
+-I did not do pair programming
+-I was unable to include error messages for every case. For the most part, the program
+will assume inputs are formatted correctly
+-Object numbers on polygons may not be perfectly centered, but they are centered more or less
+-Object number is printed in black, so if an object is black it will simply blend in
+-Object number for text is put below text so it doesn't overlap

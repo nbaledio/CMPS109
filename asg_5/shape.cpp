@@ -126,10 +126,20 @@ void polygon::draw (const vertex& center, const rgbcolor& color) const {
    DEBUGF ('d', this << "(" << center << "," << color << ")");
    glBegin(GL_POLYGON);
    glColor3ubv(color.ubvec);
+   GLfloat xaverage;
+   GLfloat yaverage;
+   for(unsigned int i = 0; i < vertices.size(); i++){
+      xaverage += vertices[i].xpos;
+   }
+   xaverage /= vertices.size();
+   for(unsigned int i = 0; i < vertices.size(); i++){
+      yaverage += vertices[i].ypos;
+   }
+   yaverage /= vertices.size();
    for(unsigned int i = 0; i < vertices.size(); i++){
         //Re-locate to new center
-        glVertex2f(vertices[i].xpos+center.xpos,
-        vertices[i].ypos+center.ypos);
+        glVertex2f(vertices[i].xpos-xaverage+center.xpos,
+        vertices[i].ypos-yaverage+center.ypos);
    }
    glEnd();
 }
@@ -137,9 +147,24 @@ void polygon::draw (const vertex& center, const rgbcolor& color) const {
 //Borders utilize GL_LINE_LOOP, instead of GL_POLYGON. Methods for
 //drawing are still the same
 
-void text::drawborder(const vertex&, const rgbcolor&, 
-const GLfloat&) const {
-
+void text::drawborder(const vertex& center, const rgbcolor& color, 
+const GLfloat& thickness) const {
+   //Calculate width/height for rectangle border
+   GLfloat width = glutBitmapLength(glut_bitmap_font, 
+   reinterpret_cast<const unsigned char*>(textdata.c_str()));
+   GLfloat height = glutBitmapHeight(glut_bitmap_font);
+   //Same as polygon's draw border method. except we define the
+   //4 vertices of the rectangle manually instead of running a loop
+   glLineWidth(thickness);
+   glBegin(GL_LINE_LOOP);
+   glColor3ubv(color.ubvec);
+   glLineWidth(thickness);
+   glVertex2f(center.xpos,center.ypos-height/2);
+   glVertex2f(center.xpos,center.ypos+height);
+   glVertex2f(center.xpos+width,center.ypos+height);
+   glVertex2f(center.xpos+width,center.ypos-height/2);
+   glEnd();
+   
 }
 
 void ellipse::drawborder(const vertex& center, const rgbcolor& color, 
@@ -167,28 +192,39 @@ const GLfloat& thickness ) const {
    glLineWidth(thickness);
    glBegin(GL_LINE_LOOP);
    glColor3ubv(color.ubvec);
-   //glLineWidth(thickness);
+   GLfloat xaverage;
+   GLfloat yaverage;
+   for(unsigned int i = 0; i < vertices.size(); i++){
+      xaverage += vertices[i].xpos;
+   }
+   xaverage /= vertices.size();
+   for(unsigned int i = 0; i < vertices.size(); i++){
+      yaverage += vertices[i].ypos;
+   }
+   yaverage /= vertices.size();
    for(unsigned int i = 0; i < vertices.size(); i++){
         //Re-locate to new center
-        glVertex2f(vertices[i].xpos+center.xpos,
-        vertices[i].ypos+center.ypos);
+        glVertex2f(vertices[i].xpos-xaverage+center.xpos,
+        vertices[i].ypos-yaverage+center.ypos);
    }
         glEnd();
 }
 
 void text::drawnumber(const vertex& center, const string& number)
 const{
-   rgbcolor white = rgbcolor{255, 255, 255};
-   glColor3ubv(white.ubvec); //Set text color
-   glRasterPos2f(center.xpos-10,center.ypos-10); //Set position
+   GLfloat width = glutBitmapLength(glut_bitmap_font,
+   reinterpret_cast<const unsigned char*>(textdata.c_str()));
+   rgbcolor black = rgbcolor{0, 0, 0};
+   glColor3ubv(black.ubvec); //Set text color
+   glRasterPos2f(center.xpos+width/2,center.ypos-10); //Set position
    glutBitmapString (GLUT_BITMAP_8_BY_13, //Set Font/text
    reinterpret_cast<const unsigned char*>(number.c_str()));
 }
 
 void ellipse::drawnumber(const vertex& center, const string& number)
 const{
-   rgbcolor white = rgbcolor{255, 255, 255};
-   glColor3ubv(white.ubvec); //Set text color
+   rgbcolor black = rgbcolor{0, 0, 0};
+   glColor3ubv(black.ubvec); //Set text color
    glRasterPos2f(center.xpos,center.ypos); //Set position
    glutBitmapString (GLUT_BITMAP_8_BY_13, //Set Font/text
    reinterpret_cast<const unsigned char*>(number.c_str()));
@@ -196,8 +232,8 @@ const{
 
 void polygon::drawnumber(const vertex& center, const string& number) 
 const{
-   rgbcolor white = rgbcolor{255, 255, 255};
-   glColor3ubv(white.ubvec); //Set text color
+   rgbcolor black = rgbcolor{0, 0, 0};
+   glColor3ubv(black.ubvec); //Set text color
    glRasterPos2f(center.xpos,center.ypos); //Set position
    glutBitmapString (GLUT_BITMAP_8_BY_13, //Set Font/text
    reinterpret_cast<const unsigned char*>(number.c_str()));

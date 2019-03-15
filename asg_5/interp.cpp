@@ -16,6 +16,8 @@ unordered_map<string,interpreter::interpreterfn>
 interpreter::interp_map {
    {"define" , &interpreter::do_define },
    {"draw"   , &interpreter::do_draw   },
+   {"border" , &interpreter::do_border },
+   {"moveby" , &interpreter::do_moveby },
 };
 
 unordered_map<string,interpreter::factoryfn>
@@ -80,6 +82,24 @@ void interpreter::do_draw (param begin, param end) {
    //Push object to vector so draw can iterate though them
    window::push_back(object(itor->second, where, color));
    //itor->second->draw (where, color);
+}
+
+void interpreter::do_border (param begin, param end){
+   if (end - begin != 2) throw runtime_error ("syntax error");
+   string num = begin[1].c_str();
+   int conv = std::stoi(num);
+   GLfloat newborder = conv;
+   window::thickness  =  newborder;
+   rgbcolor color {begin[0]};
+   window::bordercolor = color;
+}
+
+void interpreter::do_moveby (param begin, param end){
+   if (end - begin != 1) throw runtime_error ("syntax error");
+   string num = begin[0].c_str();
+   int conv = std::stoi(num);
+   GLfloat newmove = conv;
+   window::pixels = newmove;
 }
 
 shape_ptr interpreter::make_shape (param begin, param end) {
